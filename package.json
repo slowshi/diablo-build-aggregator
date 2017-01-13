@@ -1,0 +1,11 @@
+{
+  "name": "diablo-buid-aggregator",
+  "version": "0.0.1",
+  "description": "Gets popular diablo builds.",
+  "dependencies": {
+    "mime": "~1.2.7"
+  },
+  "devDependencies": {
+    "https": "^1.0.0"
+  }
+}
