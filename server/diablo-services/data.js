@@ -11,7 +11,6 @@ var getGameData = function getGameData(_endpoint, _apiKey) {
     var endpoint = _endpoint;
     var getter = endpoint.includes("?") ? '&' : '?';
     var url = endpoint + getter + apiKey;
-    console.log('doURL', url);
     request(url, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         fulfill(body);
@@ -39,7 +38,7 @@ var saveLadderGets = function saveLadderGets() {
     var saveJSON = getPlayerEndpoint(jsonObj);
     fs.writeFile('js/player-data/endpoints.json', JSON.stringify(saveJSON), 'utf8', function() {
       console.log("Done saving player gets.");
-      //saveHeroData();
+      saveHeroData();
     }); 
   });
 };
@@ -95,7 +94,63 @@ var saveHeroData = function() {
     }, 500);
   });
 }
-
+var countItems = function() {
+  var allItems = {
+    head: [],
+    torso: [],
+    feet: [],
+    hands: [],
+    shoulders: [],
+    legs: [],
+    bracers: [],
+    mainHand: [],
+    offHand: [],
+    waist: [],
+    rightFinger: [],
+    leftFinger: [],
+    neck: []
+  };
+  fs.readFile('js/player-data/endpoints.json', function(err, data) {
+    var prefix = 'js/player-data/ladder/';
+    var playerIds = JSON.parse(data).playerIds;
+    var x = 0;
+    var intervalID = setInterval(function () {
+      var playerFile = prefix + playerIds[x];
+      fs.exists(playerFile, function(exists) {
+        if (exists) {
+          fs.readFile(playerFile, function(err, playerData) {
+            var items = JSON.parse(playerData).items;
+            for(var i in allItems) {
+              var slot = allItems[i];
+              var playerSlot = items[i];
+              if(playerSlot === void 0) continue;
+              var uniqueItem = true;
+              for(var j = 0; j < slot.length; j++) {
+                if(playerSlot.id == slot[j].item.id) {
+                  uniqueItem = false;
+                  slot[j].count++;
+                }
+              }
+              if(uniqueItem) {
+                var obj = {
+                  item: playerSlot,
+                  count: 1
+                }
+                slot.push(obj);
+              }
+            }
+            if (++x === playerIds.length) {
+              clearInterval(intervalID);
+              fs.writeFile('js/player-data/items.json', JSON.stringify({items: allItems}), 'utf8', function() {
+                console.log("Saved popular items");
+              }); 
+            }
+          });
+        }
+      });
+    }, 10);
+  });
+};
 var string = "https://us.api.battle.net/d3/profile/Len%231226/?locale=en_US";
 var player = "https://us.api.battle.net/d3/profile/Unlighten%231225/hero/83569075?locale=en_US"
 var string2 = 'https://us.api.battle.net/data/d3/season/9/leaderboard/rift-monk?namespace=2-1-US';
@@ -106,6 +161,7 @@ var string2 = 'https://us.api.battle.net/data/d3/season/9/leaderboard/rift-monk?
 //getPlayersItems();
 //saveLadderGets();
 // walkJson();
+//countItems();
 module.exports = {
   init: function() {}
 };

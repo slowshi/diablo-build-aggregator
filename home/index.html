@@ -1,4 +1,22 @@
 <h4 class="text-xs-center">Starter App</h4>
 <div class="game-window">
-
+  <div class="container-fluid">
+    <div class="row row-eq-height">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" ng-repeat="(key, items) in HomeCtrl.slots.items.items">
+        <div class="card">
+          <div class="card-block">
+            <h4 class="card-title">{{key}}</h4>
+          </div>
+            <ul class="list-group list-group-flush" >
+              <li class="list-group-item" ng-repeat="item in items">
+                {{item.item.name}} || {{item.count}}
+                <item-icon
+                  icon-id="unique_spiritstone_004_x1_demonhunter_male"
+                  size="small"></item-icon>
+                </li>
+            </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
