@@ -1,10 +1,13 @@
 define([
   'app',
-  'text!data.json'
+  'text!player-data/ladder.json',
+  'text!player-data/endpoints.json'
 ],
-function(app,data) {
-  var json = JSON.parse(data);
+function(app,ladder, endpoints) {
+  var json = JSON.parse(ladder);
+  var json2 = JSON.parse(endpoints);
   console.log(json);
+  console.log(json2);
   app.registerController('HomeController', ['$scope', 'cssInjector', 
     function($scope, cssInjector) {
       cssInjector.add('home/index.css');

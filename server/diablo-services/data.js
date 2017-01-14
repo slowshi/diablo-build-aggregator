@@ -1,69 +1,111 @@
-var https = require('https');
+var https = require('http');
 var fs = require('fs');
 var bfj = require('bfj');
+var request = require('request');
+var Promise = require('promise');
+var apiKey = 'apikey=jjpamv7n88e7ng8knequ4shgkj7mvnrp';
 
-var getCommunityData = function(_endpoint) {
-  var apiKey = 'apikey=jjpamv7n88e7ng8knequ4shgkj7mvnrp';
-  var endpoint = _endpoint;
-  var getter = endpoint.includes("?") ? '&' : '?';
-  var url = endpoint + getter + apiKey;
-  https.get(url, function(res) {
-    res.on('data', function(data) {
-      process.stdout.write(data);
+var getGameData = function getGameData(_endpoint, _apiKey) {
+  return new Promise(function (fulfill, reject){
+    var apiKey = _apiKey || 'access_token=ht4b9buxafe3zfgq9vvgwy4a';
+    var endpoint = _endpoint;
+    var getter = endpoint.includes("?") ? '&' : '?';
+    var url = endpoint + getter + apiKey;
+    console.log('doURL', url);
+    request(url, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        fulfill(body);
+      }else {
+        reject(error);
+      }
     });
-  })
-  .on('error', function(res) {
-    console.log('err', res);
   });
 };
-var getGameData = function(_endpoint) {
-  var apiKey = 'access_token=ht4b9buxafe3zfgq9vvgwy4a';
-  var endpoint = _endpoint;
-  var getter = endpoint.includes("?") ? '&' : '?';
-  var url = endpoint + getter + apiKey;
-  var writeStream = fs.createWriteStream('js/data.json');
 
-  https.get(url, function(res) {
-    res.on('data', function(data) {
-      var stream = bfj.streamify(data);
+var saveLadderData = function saveLadderData(_endpoint) {
+  getGameData(_endpoint)
+  .then(function(data) {
+    fs.writeFile('js/player-data/ladder.json', data, 'utf8', function() {
+      console.log("Done saving ladder data.");
+      saveLadderGets();
+    }); 
+  });
+};
 
-      // Get data out of the stream with event handlers
-      stream.on('data', function(chunk) {
-         /* ... */ 
-         writeStream.write(JSON.parse(chunk));
-         //console.log(JSON.stringify(JSON.parse(chunk));
-        });
-      stream.on('end', function() { 
-        /* ... */
-        //writeStream.end();
+var saveLadderGets = function saveLadderGets() {
+  fs.readFile('js/player-data/ladder.json', function(err, data) {
+    if (err) throw err;
+    var jsonObj = JSON.parse(data);
+    var saveJSON = getPlayerEndpoint(jsonObj);
+    fs.writeFile('js/player-data/endpoints.json', JSON.stringify(saveJSON), 'utf8', function() {
+      console.log("Done saving player gets.");
+      //saveHeroData();
+    }); 
+  });
+};
+
+var getPlayerEndpoint = function getPlayerEndpoint(jsonObj, _limit) {
+  var limit = _limit || jsonObj.row.length;
+  var allPlayers = [];
+  var playerIds = [];
+  for(var i = 0; i < limit; i++) {
+    var playerData = jsonObj.row[i].player[0].data;
+    var playerId = 0;
+    var playerBattleTag = '';
+    for(var j = 0; j < playerData.length; j++) {
+      var playerInfo = playerData[j];
+      switch(playerInfo.id) {
+        case "HeroId": 
+          playerId = playerInfo.number;
+        break;
+        case "HeroBattleTag":
+          playerBattleTag =playerInfo.string;
+        break;
+      }
+    }
+    var endpoint = 'https://us.api.battle.net/d3/profile/'+  encodeURIComponent(playerBattleTag) +
+      '/hero/'+  playerId + '?locale=en_US';
+    allPlayers.push(endpoint);
+    playerIds.push(playerId + '.json');
+  }
+  return {
+    allPlayer: allPlayers,
+    playerIds: playerIds,
+  };
+};
+
+var saveHeroData = function() {
+  fs.readFile('js/player-data/endpoints.json', function(err, data) {
+    if (err) throw err;
+    var jsonObj = JSON.parse(data);
+    var x = 0;
+    var intervalID = setInterval(function () {
+      getGameData(jsonObj.playerArray[x], apiKey)
+      .then(function(items){
+        var itemsObj = JSON.parse(items);
+        var fileName = itemsObj.id + '.json';
+        fs.writeFile('js/player-data/ladder/' + fileName, JSON.stringify(itemsObj), 'utf8', function() {
+          console.log("Saved ladder hero: "+ fileName);
+        }); 
       });
-      stream.on('dataError', function() { /* ... */});
 
-      // bfj.write("js/data.json", data)
-      // .then(function() {
-
-      // })
-      // .catch(function(err) {
-      //   console.log(err);
-      // });
-      // fs.writeFile("js/data.json", JSON.stringify(JSON.parse(data)), function(err) {
-      //     if(err) {
-      //         return console.log(err);
-      //     }
-
-      //     console.log("The file was saved!");
-      // }); 
-    });
-  })
-  .on('error', function(res) {
-    console.log('err', res);
+      if (++x === jsonObj.playerArray.length) {
+          clearInterval(intervalID);
+      }
+    }, 500);
   });
-};
-var string = "https://us.api.battle.net/d3/profile/Len%231226/?locale=en_US";
-var string2 = 'https://us.api.battle.net/data/d3/season/9/leaderboard/rift-monk?namespace=2-1-US';
-//getCommunityData(string);
-getGameData(string2);
+}
 
+var string = "https://us.api.battle.net/d3/profile/Len%231226/?locale=en_US";
+var player = "https://us.api.battle.net/d3/profile/Unlighten%231225/hero/83569075?locale=en_US"
+var string2 = 'https://us.api.battle.net/data/d3/season/9/leaderboard/rift-monk?namespace=2-1-US';
+// getCommunityData(player);
+//requestTest(string2);
+//getGameData(string2);
+//saveLadderData(string2);
+//getPlayersItems();
+//saveLadderGets();
+// walkJson();
 module.exports = {
   init: function() {}
 };
