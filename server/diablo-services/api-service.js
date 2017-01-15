@@ -1,8 +1,12 @@
-var dataService = require('./data-service.js');
-var crudService = require('./crud-service.js');
 var fs = require('fs');
 var Promise = require('promise');
 var accessToken = '';
+var dataService = require('./data-service.js');
+var heroDataService = require('./hero-data-service.js');
+var crudService = require('./crud-service.js');
+var apiTransform = require('./api-transform.js');
+var modelHelper = require('../model-helper.js');
+var ladderDataService = require('./ladder-data-service.js');
 
 var makeEndpointUrl = function makeEndpointUrl(_endpoint, _useApiKey) {
   var endpoint = _endpoint;
@@ -45,7 +49,10 @@ var loadLadderDataFromEndpoint = function loadLadderDataFromEndpoint() {
     'https://us.api.battle.net/data/d3/season/9/leaderboard/rift-monk?namespace=2-1-US');
     return crudService._get(endpoint)
     .then(function(data){
-      return crudService._save('js/player-data/ladder.json', data);
+      var flatData = ladderDataService.parseLadderData(data);
+      var formatter = modelHelper.getFormatter(apiTransform.getLadder);
+      var formatted = formatter(flatData);
+      return crudService._save('js/player-data/ladder.json', formatted);
     });
 };
 
@@ -58,52 +65,67 @@ var getLadderData = function getLadderData(_refresh) {
   }
 };
 
-var loadHeroDataFromJson = function loadHeroData() {
-  return crudService._load('js/player-data/endpoints.json');
-};
+var saveHeroData = function setHeroData() {
+  return new Promise(function (resolve, reject) {
+    getLadderData()
+    .then(function(data){
+        var x = 0;
+        var intervalID = setInterval(function () {
+          var heroData = data.row[x];
+          var heroEndpoint = 
+            makeEndpointUrl(heroDataService.getEndpoint(heroData), true);
+          var heroJsonPath = heroDataService.getJsonPath(heroData);
+          var heroRiftLevel = heroData.data.riftLevel;
+          var heroRiftTime = heroData.data.riftTime;
 
-var loadHeroDataFromEndpoint = function loadHeroDataFromEndpoint() {
- return getLadderData(true)
-  .then(function(data){
-    var saveJson = dataService.getHeroEndpoints(data);
-    return crudService._save('js/player-data/endpoints.json', saveJson);
+          crudService._get(heroEndpoint)
+          .then(function(data) {
+            var formatter = modelHelper.getFormatter(apiTransform.getHero);
+            var formatted = formatter(data);
+            formatted.riftLevel = heroRiftLevel;
+            formatted.riftTime = heroRiftTime;
+            crudService._save(heroJsonPath, formatted);
+          }) 
+
+          if (++x === data.row.length) {
+              clearInterval(intervalID);
+              resolve();
+          }
+        }, 500);
+    });
   });
 };
 
-var getHeroData = function getHeroData(_refresh) {
-  var refresh = _refresh || false;
-  if(refresh) {
-    return loadHeroDataFromEndpoint()
-  } else { 
-    return loadHeroDataFromJson()
-  }
-}
-var loadHeroFromJson = function(heroData) {
-    var heroFolder = 'js/player-data/ladder/';
-    var jsonFile  = heroFolder + heroData.jsonFile;
-  return crudService._load(jsonFile);
-}
-var getHeroItems = function getHeroItems(id) {
-  getHeroData().
-  then(function(data){
-    var heroFolder = 'js/player-data/ladder/';
-    var x = 0;
-    var heroData = data.heroData;
-    var intervalID = setInterval(function () {
-      var heroFile = heroFolder + heroData[x].jsonFile;
-      getHero(heroData[x]);
-      if (++x === 1) {
-        clearInterval(intervalID);
-      }
-    },10);
-  })
+var loadHeroDataFromJson = function loadHeroDataFromJson(heroData) {
+  var heroJsonPath = heroDataService.getJsonPath(heroData);
+  return crudService._load(heroJsonPath);
+};
+
+var loadAllHeroes = function loadAllHeroes(id) {
+  return new Promise(function (resolve, reject) {
+    getLadderData().
+    then(function(data){
+      var x = 0;
+      var intervalID = setInterval(function () {
+        loadHeroDataFromJson(data.row[x])
+        .then(function(data){
+          heroDataService.parseHero(data);
+        });
+        if (++x === 20) {
+          resolve();
+          console.log(heroDataService.getHeroSets());
+          clearInterval(intervalID);
+        }
+      },10);
+    });
+  });
 }
 
 
 module.exports = {
   setAccessToken: setAccessToken,
   getLadderData: getLadderData,
-  getHeroData: getHeroData,
-  getHeroItems: getHeroItems,
-  loadHeroFromJson: loadHeroFromJson,
+  saveHeroData: saveHeroData,
+  loadAllHeroes: loadAllHeroes,
+  // loadHeroDataFromJson: loadHeroDataFromJson,
 };

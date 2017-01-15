@@ -3,6 +3,7 @@ var Promise = require('promise');
 var fs = require('fs');
 
 var _get = function _get(_endpoint) {
+  console.log(_endpoint);
   return new Promise(function (resolve, reject) {
     var endpoint = _endpoint;
     request(endpoint, function (error, response, body) {
