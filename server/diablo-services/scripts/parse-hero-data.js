@@ -13,7 +13,7 @@ var parseHeroData = function parseHeroData(id) {
       for(var i =0; i< data.row.length; i++) {
         var hero = data.row[i];
         heroArray.push(
-          apiService.loadHeroDataFromJson(hero)
+          apiService.getHeroData(hero)
           .then(heroDataService.parseHero));
       }
       Promise.all(heroArray).then(function(res){

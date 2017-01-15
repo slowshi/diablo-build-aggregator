@@ -87,6 +87,15 @@ var loadHeroDataFromJson = function loadHeroDataFromJson(heroData) {
   return crudService._load(heroJsonPath);
 };
 
+var getHeroData = function getLadderData(heroData, _refresh) {
+  var refresh = _refresh || false;
+  if(refresh) {
+    return loadHeroDataFromEndpoint(heroData);
+  } else { 
+    return loadHeroDataFromJson(heroData);
+  }
+};
+
 var loadItemDataFromJson = function loadItemDataFromJson(itemId) {
   var itemString = 'js/item-data/' + itemId + '.json';
   return crudService._load(itemString);
@@ -118,7 +127,6 @@ module.exports = {
   makeEndpointUrl: makeEndpointUrl,
   setAccessToken: setAccessToken,
   getLadderData: getLadderData,
-  loadHeroDataFromJson: loadHeroDataFromJson,
-  loadHeroDataFromEndpoint: loadHeroDataFromEndpoint,
+  getHeroData: getHeroData,
   getItemData: getItemData
 };

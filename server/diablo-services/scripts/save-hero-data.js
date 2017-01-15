@@ -11,7 +11,7 @@ var saveHeroData = function setHeroData() {
         var heroArray = [];
         for(var  i = 0; i < data.row.length; i++) {
           var heroData = data.row[i];
-          var getHero = apiService.loadHeroDataFromEndpoint(heroData);
+          var getHero = apiService.getHeroData(heroData, true);
           heroArray.push(getHero);
         }
         Promise.all(heroArray).then(function(res){
