@@ -17,43 +17,52 @@ var getJsonPath = function getJsonPath(ladderData) {
 
   return jsonPath;
 };
-var addToAllSets = function addToAllSets(sets) {
-  for(var i in sets) {
-    var setName = sets[i];
-    var hasSet = false;
-    for(var j in allSets) {
-      var allSet = allSets[j];
-      if(allSet.id == setName) {
-        allSet.count++;
-      }
-    }
-    if(!hasSet) {
-      allSets.push({
-        id: setName,
-        count: 1
-      })
+
+var getJsonPathFromId = function getJsonPathFromId(id) {
+  var jsonPath = 'js/player-data/ladder/' + id + '.json';
+  
+  return jsonPath;
+};
+
+var addToAllSets = function addToAllSets(heroSet) {
+  var hasSet = false;
+  for(var j in allSets) {
+    var validSet = allSets[j];
+    if(_.isEqual(validSet.sets, heroSet.sets)) {
+      validSet.heroIds.push(heroSet.heroId);
+      hasSet = true;
     }
   }
-  var test = [1,2,3];
-  var test2 = [1,2,3];
-  console.log(_.isEqual(test,test2))
-  //console.log(allSets)
+  if(!hasSet) {
+    allSets.push({
+      sets: heroSet.sets,
+      heroIds: [heroSet.heroId]
+    });
+  }
 }
 
 var findHeroSets = function getHeroItems(data) {
-  // console.log('getHeroItems',data);
   var heroSets = [];
   for(var i in data.items) {
     var item = data.items[i];
     if(item.setItemsEquipped !== void 0) {
-      var setString = item.setItemsEquipped.toString();
-      if (heroSets.indexOf(setString) === -1) {
-        heroSets.push(setString)
+      var set = item.setItemsEquipped.sort();
+      var hasSet = false;
+      for(var j in heroSets) {
+        if(_.isEqual(heroSets[j], set)) {
+          hasSet = true;
+        }
+      }
+      if (!hasSet) { 
+        heroSets.push(set);
       }
     }
   }
-  addToAllSets(heroSets);
-  return heroSets;
+  var hero = {
+    sets: heroSets, 
+    heroId: data.id
+  };
+  return hero;
 }
 var getLegendaryPowers = function getHeroItems(data) {
   // console.log('getHeroItems',data);
@@ -62,8 +71,12 @@ var getLegendaryPowers = function getHeroItems(data) {
   return gear;
 }
 var parseHero = function parseHero(data) {
-  allHeroes[data.id] = data;
-  findHeroSets(data);
+  return new Promise(function (resolve, reject) {
+    allHeroes[data.id] = data;
+    var heroSets = findHeroSets(data);
+    addToAllSets(heroSets);
+    resolve();
+  });
 }
 
 var getAllHeroes = function getAllHeroes() {

@@ -22,7 +22,23 @@ var parseLadderData = function parseLadderData(data) {
     return data;
 };
 
+var parseItemData = function parseItemData(data) {
+  if(data.set !== void 0) {
+    data.set.items = _.map(data.set.items, 'id');
+    data.set.ranks = _.map(data.set.ranks, 'required');
+  }
+  return data;
+};
+
+var parseHeroData = function parseHeroData(data) {
+  if(data.legendaryPowers !== void 0) {
+    data.legendaryPowers = _.map(data.legendaryPowers, 'id');
+  }
+  return data;
+};
+
 module.exports = {
   parseLadderData: parseLadderData,
-  //getPopularItems: getPopularItems
+  parseItemData: parseItemData,
+  parseHeroData: parseHeroData
 };

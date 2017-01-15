@@ -3,15 +3,18 @@ define([
   'text!player-data/ladder.json',
   'text!player-data/endpoints.json',
   'text!player-data/items.json',
+  'text!player-data/sets.json',
   './js/item-icon/index.js'
 ],
-function(app,ladder, endpoints, items) {
+function(app,ladder, endpoints, items, sets) {
   var json = JSON.parse(ladder);
   var json2 = JSON.parse(endpoints);
   var json3 = JSON.parse(items);
+  var json4 = JSON.parse(sets);
   console.log(json);
   console.log(json2);
   console.log(json3);
+  console.log(json4);
   app.registerController('HomeController', ['$scope', 'cssInjector', 
     function($scope, cssInjector) {
       this.slots = {};
