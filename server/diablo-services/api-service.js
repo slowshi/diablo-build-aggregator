@@ -96,16 +96,15 @@ var getHeroData = function getHeroData(heroData, _refresh) {
   }
 };
 
-var loadItemDataFromJson = function loadItemDataFromJson(itemId) {
-  var itemString = 'js/item-data/' + itemId + '.json';
+var loadItemDataFromJson = function loadItemDataFromJson(itemString) {
   return crudService._load(itemString);
 }
 
 var loadItemDataFromEndpoint = function loadItemDataFromEndpoint(itemId) {
   var endpoint = "https://us.api.battle.net/d3/data/item/" + itemId;
-  var itemString = 'js/item-data/' + itemId + '.json';
+  var itemString = 'js/item-data/items/' + itemId + '.json';
   var endpointUrl = makeEndpointUrl(endpoint, true);
-  return crudService._get(endpointUrl)
+  return crudService._delayGet(endpointUrl)
   .then(function(data) {
       var formatter = modelHelper.getFormatter(apiTransform.getItem);
       var formatted = formatter(data);
@@ -115,9 +114,9 @@ var loadItemDataFromEndpoint = function loadItemDataFromEndpoint(itemId) {
 }
 
 var getItemData = function getItemData(itemId) {
-  var itemString = 'js/item-data/' + itemId + '.json';
+  var itemString = 'js/item-data/items/' + itemId + '.json';
   if(fs.existsSync(itemString)){
-    return loadItemDataFromJson();
+    return loadItemDataFromJson(itemString);
   } else {
     return loadItemDataFromEndpoint(itemId);
   }

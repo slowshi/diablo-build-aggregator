@@ -5,19 +5,25 @@ var heroDataService = require('../hero-data-service.js');
 var crudService = require('../crud-service.js');
 var apiService = require('../api-service.js');
 
-var parseHeroData = function parseHeroData(id) {
+var init = function init(id) {
   return new Promise(function (resolve, reject) {
     apiService.getLadderData().
     then(function(data){
       var heroArray = [];
-      for(var i =0; i< data.row.length; i++) {
+      //data.row.length
+      for(var i =0; i < data.row.length; i++) {
         var hero = data.row[i];
         heroArray.push(
           apiService.getHeroData(hero)
           .then(heroDataService.parseHero));
       }
       Promise.all(heroArray).then(function(res){
-        crudService._save('js/player-data/sets.json', heroDataService.getHeroSets())
+        console.log("Done getting users!")
+        var allItems = heroDataService.getAllItemIds();
+        return crudService._save('js/item-data/itemids.json', allItems).then(
+          function(){
+            resolve();
+          });
       });
     });
   });
@@ -25,5 +31,5 @@ var parseHeroData = function parseHeroData(id) {
 
 
 module.exports = {
-  parseHeroData: parseHeroData
+  init: init
 };

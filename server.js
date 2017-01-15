@@ -3,17 +3,20 @@ var accessToken = process.argv[3] || '';
 var startup = require('./server/startup.js');
 var apiService = require('./server/diablo-services/api-service.js');
 var parseHeroData = require('./server/diablo-services/scripts/parse-hero-data.js');
-var saveHeroData = require('./server/diablo-services/scripts/save-hero-data.js');
-// var _ = require('lodash');
-// var apiTransform = require('./server/diablo-services/api-transform.js');
-// var modelHelper = require('./server/model-helper.js');
-// var formatter = modelHelper.getFormatter(apiTransform.getLadder);
+var parseItemData = require('./server/diablo-services/scripts/parse-item-data.js');
+var parseHeroSetData = require('./server/diablo-services/scripts/parse-hero-set-data.js');
 
 startup.initialize(serverUrl)
 .then(function() {
   apiService.setAccessToken(accessToken)
   .then(function(){
-    saveHeroData.saveHeroData();
+    //parseHeroData.init();
+   parseItemData.init()
+   .then(parseHeroData.init)
+   .then(parseHeroSetData.init)
+   .then(function(){
+     console.log('sets done to');
+   });
   })
 })
 
