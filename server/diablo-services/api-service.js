@@ -87,7 +87,7 @@ var loadHeroDataFromJson = function loadHeroDataFromJson(heroData) {
   return crudService._load(heroJsonPath);
 };
 
-var getHeroData = function getLadderData(heroData, _refresh) {
+var getHeroData = function getHeroData(heroData, _refresh) {
   var refresh = _refresh || false;
   if(refresh) {
     return loadHeroDataFromEndpoint(heroData);
