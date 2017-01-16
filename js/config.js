@@ -13,7 +13,8 @@ require.config({
     'store-service': 'store-service/index',
     'preloadjs': 'vendors/createjs/preloadjs/0.6.1/preloadjs-0.6.1.min',
     'soundjs': 'vendors/createjs/soundjs/0.6.1/soundjs-0.6.1.min',
-    'numeral': 'vendors/numeral/numeral.min'
+    'numeral': 'vendors/numeral/numeral.min',
+    'socket-io': '/socket.io/socket.io',
   },
   shim: {
     'angular': {
@@ -23,7 +24,7 @@ require.config({
       deps: ['angular']
     },
     'app-init': {
-      deps: ['angular', 'app']
+      deps: ['angular', 'app', 'socket-io']
     }
   }
 });

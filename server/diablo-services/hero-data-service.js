@@ -28,54 +28,6 @@ var getJsonPathFromId = function getJsonPathFromId(id) {
   return jsonPath;
 };
 
-var addToAllSets = function addToAllSets(heroSet) {
-  var hasSet = false;
-  for(var j in allSets) {
-    var validSet = allSets[j];
-    if(_.isEqual(validSet.sets, heroSet.sets)) {
-      validSet.heroIds.push(heroSet.heroId);
-      hasSet = true;
-    }
-  }
-  if(!hasSet) {
-    allSets.push({
-      sets: heroSet.sets,
-      heroIds: [heroSet.heroId]
-    });
-  }
-}
-
-var findHeroSets = function getHeroItems(data) {
-  var heroSets = [];
-  for(var i in data.items) {
-    var item = data.items[i];
-    if(item.setItemsEquipped !== void 0) {
-      var set = item.setItemsEquipped.sort();
-      var hasSet = false;
-      for(var j in heroSets) {
-        if(_.isEqual(heroSets[j], set)) {
-          hasSet = true;
-        }
-      }
-      if (!hasSet) { 
-        heroSets.push(set);
-      }
-    }
-  }
-  var hero = {
-    sets: heroSets, 
-    heroId: data.id
-  };
-  return hero;
-}
-
-var getLegendaryPowers = function getHeroItems(data) {
-  // console.log('getHeroItems',data);
-  var gear = {'foo': 'bar'};
-
-  return gear;
-};
-
 var parseAllItemIds = function parseAllItemIds(data) {
   for (var i in data.items) {
     var item = data.items[i];
@@ -103,8 +55,6 @@ var parseAllItemIds = function parseAllItemIds(data) {
 var parseHero = function parseHero(data) {
   return new Promise(function (resolve, reject) {
     allHeroes[data.id] = data;
-    // var heroSets = findHeroSets(data);
-    // addToAllSets(heroSets);
     parseAllItemIds(data);
     resolve();
   });
@@ -115,18 +65,17 @@ var getAllHeroes = function getAllHeroes() {
   return _.cloneDeep(allHeroes);
 }
 
-var getHeroSets = function getHeroSets() {
-  return _.cloneDeep(allSets);
-}
-
 var getAllItemIds = function getAllItemIds() {
   return _.cloneDeep(allItemIds);
 }
+var getHeroData = function getHeroData(heroId) {
+  return allHeroes[heroId];
+}
 module.exports = {
   getAllHeroes: getAllHeroes,
-  getHeroSets: getHeroSets,
   getAllItemIds: getAllItemIds,
   parseHero: parseHero,
   getEndpoint: getEndpoint,
   getJsonPath: getJsonPath,
+  getHeroData: getHeroData
 };

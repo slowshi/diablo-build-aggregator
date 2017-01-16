@@ -1,24 +1,39 @@
 define([
   'app',
-  'text!player-data/ladder.json',
-  'text!player-data/endpoints.json',
-  'text!player-data/items.json',
-  'text!player-data/sets.json',
-  './js/item-icon/index.js'
+  'text!item-data/sets.json',
+  'text!item-data/hero-sets.json',
+  'socket-io',
+  './js/item-icon/index.js',
+  './js/top-items/index.js',
 ],
-function(app,ladder, endpoints, items, sets) {
-  var json = JSON.parse(ladder);
-  var json2 = JSON.parse(endpoints);
-  var json3 = JSON.parse(items);
+function(app, sets, heroSets, io) {
   var json4 = JSON.parse(sets);
-  console.log(json);
-  console.log(json2);
-  console.log(json3);
+  var json5 = JSON.parse(heroSets);
   console.log(json4);
+  console.log(json5);
   app.registerController('HomeController', ['$scope', 'cssInjector', 
     function($scope, cssInjector) {
-      this.slots = {};
-      this.slots.items = json3;
+      //this.slots = json3;
+      this.sets = json4;
+      // var io = socket();
+      // console.log(io);
+      var userSocket = io.connect('', {reconnect: true});
+      userSocket.emit('getHeroData',8475278);
+      userSocket.on('getHeroData',function(data){
+        console.log('getHeroData', data);
+      });
+
+      userSocket.emit('getHeroSets', 'innas-mantra');
+      userSocket.on('getHeroSets',function(data){
+        console.log('getHeroSets', data);
+      });
+
+      userSocket.on('connect', function(){
+        console.log('connected')
+      });
+      userSocket.on('disconnect', function(){
+        console.log("NO")
+      });
       cssInjector.add('home/index.css');
       cssInjector.add('js/vendors/bootstrap/4.0.0/css/bootstrap.min.css');
     }]);
