@@ -5,7 +5,7 @@ define([
 ],
 function(app, html) {
 
-  app.registerDirective('itemIcon', [function() {
+  app.registerDirective('topItems', [function() {
     return {
       restrict: 'E',
       scope: {},
@@ -15,13 +15,13 @@ function(app, html) {
         return html;
       },
       bindToController: {
-        slots: '@?',
+        slots: '=?',
       }
     };
   }]);
 
   app.registerController('TopItemsController', ['$scope', 'cssInjector', 
     function($scope, cssInjector) {
-
+      var _this = this;
     }]);
 });

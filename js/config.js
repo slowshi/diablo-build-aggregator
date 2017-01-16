@@ -11,6 +11,7 @@ require.config({
     'app-init': 'app-init',
     'text': 'vendors/requirejs-text/2.0.14/text',
     'store-service': 'store-service/index',
+    'socket-service': 'socket-service/index',
     'preloadjs': 'vendors/createjs/preloadjs/0.6.1/preloadjs-0.6.1.min',
     'soundjs': 'vendors/createjs/soundjs/0.6.1/soundjs-0.6.1.min',
     'numeral': 'vendors/numeral/numeral.min',

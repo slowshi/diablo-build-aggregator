@@ -1,10 +1,8 @@
 <h4 class="text-xs-center">Starter App</h4>
 <div class="game-window">
   <div class="container-fluid">
-    <ul class="list-group list-group-flush" >
-        <li class="list-group-item" ng-repeat="set in HomeCtrl.sets">
-          {{set.name}}
-        </li>
-      </ul>
+    <!--{{HomeCtrl.allSets['innas-mantra']}}-->
+   <!--<top-items slots="HomeCtrl.allSets[HomeCtrl.testSet][5].popularItemBuild">-->
+   <item-set items="HomeCtrl.testSet"></item-set>
   </div>
 </div>

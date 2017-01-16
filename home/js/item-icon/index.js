@@ -15,6 +15,7 @@ function(app, html) {
       bindToController: {
         iconId: '@?',
         size:'@?',
+        color:'@?'
       }
     };
   }]);

@@ -49,9 +49,20 @@ var getAllItems = function getAllItems() {
 var getAllSets = function getAllSets() {
   return _.cloneDeep(allSets);
 };
-
+var getItem = function getItem(itemid) {
+  return _.cloneDeep(allItems[itemid]);
+}
+var getItems = function getItems(itemSet) {
+  var expandedSet = [];
+  for(var i in itemSet) {
+    expandedSet.push(getItem(itemSet[i]));
+  }
+  return expandedSet;
+}
 module.exports = {
   parseItems: parseItems,
   getAllItems: getAllItems,
-  getAllSets: getAllSets
+  getAllSets: getAllSets,
+  getItem: getItem,
+  getItems: getItems
 };

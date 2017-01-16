@@ -9,8 +9,6 @@ var init = function init(id) {
   return new Promise(function (resolve, reject) {
     setsDataService.init()
     .then(function(){
-      setsDataService.getPopularItems();
-      //crudService._save('js/item-data/hero-sets.json', setsDataService.getHeroSets());
       resolve();
     });
   });

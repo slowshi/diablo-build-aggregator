@@ -12,6 +12,8 @@ var setSocket = function setSocket(connectedIo) {
       console.log('expose endpoints to socket');
       socket.on('getHeroData',getHeroData);
       socket.on('getHeroSets',getHeroSets);
+      socket.on('getPopularGearSets',getPopularGearSets);
+      socket.on('getItems', getItems);
     });
     var getHeroData = function getHeroData(heroId) {
       io.sockets.emit('getHeroData',heroDataService.getHeroData(heroId));
@@ -19,6 +21,12 @@ var setSocket = function setSocket(connectedIo) {
     var getHeroSets = function getHeroSets(_slug) {
       var slug = _slug || '';
       io.sockets.emit('getHeroSets',setsDataService.getHeroSets(slug));
+    }
+    var getPopularGearSets = function getPopularGearSets() {
+      io.sockets.emit('getPopularGearSets',setsDataService.getPopularGearSets());
+    }
+    var getItems = function getItems(itemSet) {
+      io.sockets.emit('getItems',itemDataService.getItems(itemSet));
     }
     resolve();
   });
