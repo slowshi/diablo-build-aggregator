@@ -27,7 +27,7 @@ var _get = function _get(_endpoint) {
 var _load = function(path) {
  return new Promise(function (resolve, reject){
   fs.readFile(path, function(err, data) {
-    if (err) throw error;
+    if (err) throw err;
     console.log("Finished loading from:", path);
     resolve(JSON.parse(data));
     });

@@ -96,15 +96,15 @@ var parseHero = function parseHero(data) {
 }
 
 
+var getHeroData = function getHeroData(heroId) {
+  return allHeroes[heroId];
+}
 var getAllHeroes = function getAllHeroes() {
   return _.cloneDeep(allHeroes);
 }
 
 var getAllItemIds = function getAllItemIds() {
   return _.cloneDeep(allItemIds);
-}
-var getHeroData = function getHeroData(heroId) {
-  return allHeroes[heroId];
 }
 var getPopularItems = function getPopularItems() {
   return _.cloneDeep(popularItems);

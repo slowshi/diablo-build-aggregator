@@ -15,7 +15,8 @@ function(app, html) {
       bindToController: {
         iconId: '@?',
         size:'@?',
-        color:'@?'
+        color:'@?',
+        tooltipParams: '@?'
       }
     };
   }]);
@@ -25,6 +26,8 @@ function(app, html) {
       this.size = this.size || 'large';
       var stub = 'http://media.blizzard.com/d3/icons/items/'
       this.itemUrl = stub + this.size + '/' + this.iconId + '.png';
-      console.log(this.itemUrl, 'itemUrl')
+      this.preventDefault = function preventDefault($event) {
+        $event.preventDefault()
+      }
     }]);
 });

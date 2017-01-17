@@ -2,9 +2,14 @@
   <div class="card-block">
     <h4 class="card-title">{{key}}</h4>
   </div>
-   <item-icon
-          ng-repeat="item in ItemSetCtrl.items"
-          icon-id="{{item.icon}}"
-          color="{{item.displayColor}}"
-          size="small"></item-icon>
+  <div class="card-text">
+    <div ng-repeat="slot in ItemSetCtrl.items">
+      <item-icon
+              ng-repeat="item in slot"
+              icon-id="{{item.icon}}"
+              color="{{item.displayColor}}"
+              tooltip-params="{{item.tooltipParams}}"
+              size="small"></item-icon>
+    </div>
+  </div>
 </div>

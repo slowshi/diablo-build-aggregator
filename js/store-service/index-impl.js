@@ -32,8 +32,9 @@ define([
      * @param {Function} _next
      * @returns {Object}
      * */
-    onUpdate: function onUpdate(_next) {
-      return this.cbService.register('StoreData', _next);
+    onUpdate: function onUpdate(_id, _next) {
+      var id = _id || 'StoreService';
+      return this.cbService.register(id, _next);
     },
 
     /**
@@ -41,8 +42,9 @@ define([
      * @function getStoreData
      * @returns {Object}
      * */
-    getStoreData: function getStoreData() {
-      return _.cloneDeep(this.storeData);
+    getStoreData: function getStoreData(_id) {
+      var id = _id || 'StoreService';
+      return _.cloneDeep(this.storeData[id]);
     },
 
     /**
@@ -50,23 +52,31 @@ define([
      * @function updateStoreData
      * @param {Object} data
      * */
-    updateStoreData: function updateStoreData(data) {
+    updateStoreData: function updateStoreData(_id, data) {
+      var id = _id || 'StoreService';
       if (_.isEmpty(this.initial)) {
-        this.initial = data;
+        if(this.initial[id] == void 0) {
+          this.initial[id] = data;
+        }
+        this.initial[id] = data;
       }
-      this.storeData = data;
+      if(this.storeData[id] == void 0) {
+        this.storeData[id] = data;
+      }
+      this.storeData[id] = data;
       this.dirty = !_.isEqual(
-        this.initial,
-        this.storeData);
-      this.cbService.next('StoreData', this.getStoreData());
+        this.initial[id],
+        this.storeData[id]);
+      this.cbService.next(id, this.getStoreData());
     },
 
     /**
      * Sets the initial data set to the current.
      * @function updateInitialState
      * */
-    updateInitialState: function updateInitialState() {
-      this.initial = this.storeData;
+    updateInitialState: function updateInitialState(_id) {
+      var id = _id || 'StoreService';
+      this.initial[id] = this.storeData[id];
       this.dirty = false;
     }
   };

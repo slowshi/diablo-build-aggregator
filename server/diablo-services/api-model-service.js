@@ -34,7 +34,6 @@ var parseHeroData = function parseHeroData(data) {
   if(data.legendaryPowers !== void 0) {
     data.legendaryPowers = _.map(data.legendaryPowers, 'id');
   }
-  console.log(parseHeroData);
   return data;
 };
 

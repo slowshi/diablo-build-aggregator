@@ -75,7 +75,7 @@ var loadHeroDataFromEndpoint = function loadHeroDataFromEndpoint(heroData) {
       var formatted = formatter(data);
       var remodeledData = apiModelService.parseHeroData(formatted);
       if(riftData !== void 0) {
-        remodeledData.riftLevel = riftData.heroData;
+        remodeledData.riftLevel = riftData.riftLevel;
         remodeledData.riftTime = riftData.riftTime;
       }
       return  crudService._save(heroJsonPath, remodeledData);

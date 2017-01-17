@@ -13,42 +13,55 @@ function(app, sets, heroSets) {
   console.log(json4);
   console.log(json5);
   app.registerController('HomeController', ['$scope', 'cssInjector', 'socketService',
-    function($scope, cssInjector, socketService) {
+  'storeService',
+    function($scope, cssInjector, socketService, storeService) {
       cssInjector.add('home/index.css');
       cssInjector.add('js/vendors/bootstrap/4.0.0/css/bootstrap.min.css');
       var _this = this;
-      _this.testSet = [];
-      this.allSets = {};
-      _this.loadedItems = {};
-      socketService.emit('getPopularGearSets');
-      socketService.on('getPopularGearSets',function(data){
-        console.log(data);
-        var testSet = data[0].set;
-        // for(var i = 0; i < data.length; i++) {
-        //   var set = data[i].set;
-        // }
-        socketService.emit('getItems',testSet)
-        socketService.on('getItems',function(data){
-          _this.testSet = data;
-        });
-          // var sortable = [];
-          // for (var j in data) {
-          //   sortable.push({set:j, count: data[j]})
-          // }
-
-          // sortable.sort(function(a, b) {
-          //     return a.count - b.count
-          // }).reverse();
-          // console.log(sortable.reverse());
-      });
-      // this.testSet = 'monkey-kings-garb'
-      // socketService.emit('getHeroSets', this.testSet);
-      // socketService.on('getHeroSets',function(data){
-      //   console.log('getHeroSets',data);
-      //    _this.allSets[_this.testSet] = data;
-      //    console.log(_this.allSets);
-      // });
-
+      _this.popularItems = {
+        items: [],
+        averageRiftLevel: 0,
+        averageRiftTime: 0
+      };
+      socketService.on('dataDump',function(data){
+        for(var i in data){
+          storeService.updateStoreData(i,data[i]);
+        }
+        var popularGearSets = storeService.getStoreData('popularGearSets');
+        var allItems = storeService.getStoreData('allItems');
+        for(var i in popularGearSets) {
+          var popularSet = popularGearSets[i];
+          var setDetails = [];
+          var setItems = {
+            armor: [],
+            jewelery: [],
+            weapons: []
+          };
+          for(var j in popularSet.set) {
+            var itemData = allItems[popularSet.set[j]];
+            if(itemData.slots !== void 0){
+              if(itemData.slots.indexOf('left-hand') > -1 ||
+                itemData.slots.indexOf('right-hand') > -1) {
+                  setItems.weapons.push(itemData);
+              } else if(itemData.slots.indexOf('left-finger') > -1 ||
+                itemData.slots.indexOf('right-finger') > -1 ||
+                itemData.slots.indexOf('neck') > -1) {
+                    setItems.jewelery.push(itemData)
+              }
+              else{
+                setItems.armor.push(itemData);
+              }
+            }
+          }
+          console.log(popularSet);
+          // var averageRiftTime = Math.floor(_.sum(popularSet.riftTime)/popularSet.riftTime.length);
+          // var averageRiftLevel = Math.floor(_.sum(popularSet.riftLevel)/popularSet.riftLevel.length);
+          _this.popularItems.averageRiftTime = popularSet.riftTime;
+          _this.popularItems.averageRiftLevel = popularSet.riftLevel;
+          _this.popularItems.items.push(setItems);
+          console.log(_this.popularItems);
+        }
+      })
       socketService.on('connect', function(){
         console.log('connected')
       });

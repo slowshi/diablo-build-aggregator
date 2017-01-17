@@ -10,6 +10,11 @@ var setSocket = function setSocket(connectedIo) {
     io = connectedIo;
     io.sockets.on('connection',function(socket){
       console.log('expose endpoints to socket');
+      socket.emit('dataDump',{
+        popularGearSets: setsDataService.getPopularGearSets(),
+        // allHeroes: heroDataService.getAllHeroes(),
+        allItems: itemDataService.getAllItems(),
+      })
       socket.on('getHeroData',getHeroData);
       socket.on('getHeroSets',getHeroSets);
       socket.on('getPopularGearSets',getPopularGearSets);
