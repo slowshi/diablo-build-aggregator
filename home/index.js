@@ -1,17 +1,14 @@
 define([
   'app',
   'text!item-data/sets.json',
-  'text!item-data/hero-sets.json',
   './js/item-icon/index.js',
   './js/item-set/index.js',
   './js/top-items/index.js',
   'socket-service',
 ],
-function(app, sets, heroSets) {
+function(app, sets) {
   var json4 = JSON.parse(sets);
-  var json5 = JSON.parse(heroSets);
   console.log(json4);
-  console.log(json5);
   app.registerController('HomeController', ['$scope', 'cssInjector', 'socketService',
   'storeService',
     function($scope, cssInjector, socketService, storeService) {
@@ -31,6 +28,8 @@ function(app, sets, heroSets) {
         var allItems = storeService.getStoreData('allItems');
         for(var i in popularGearSets) {
           var popularSet = popularGearSets[i];
+          if(popularSet.slug !== 'legacy-of-nightmares') continue;
+          console.log(popularSet.slug);
           var setDetails = [];
           var setItems = {
             armor: [],
@@ -53,14 +52,13 @@ function(app, sets, heroSets) {
               }
             }
           }
-          console.log(popularSet);
           // var averageRiftTime = Math.floor(_.sum(popularSet.riftTime)/popularSet.riftTime.length);
           // var averageRiftLevel = Math.floor(_.sum(popularSet.riftLevel)/popularSet.riftLevel.length);
           _this.popularItems.averageRiftTime = popularSet.riftTime;
           _this.popularItems.averageRiftLevel = popularSet.riftLevel;
           _this.popularItems.items.push(setItems);
-          console.log(_this.popularItems);
         }
+        console.log(popularGearSets);
       })
       socketService.on('connect', function(){
         console.log('connected')

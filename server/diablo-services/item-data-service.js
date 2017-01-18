@@ -3,25 +3,8 @@ var Promise = require('promise');
 var allSets = [];
 var allItems = {};
 
-var addToAllSets = function addToAllSets(heroSet) {
-  var hasSet = false;
-  for(var j in allSets) {
-    var validSet = allSets[j];
-    if(_.isEqual(validSet.sets, heroSet.sets)) {
-      validSet.heroIds.push(heroSet.heroId);
-      hasSet = true;
-    }
-  }
-  if(!hasSet) {
-    allSets.push({
-      sets: heroSet.sets,
-      heroIds: [heroSet.heroId]
-    });
-  }
-};
-
 var findSets = function getHeroItems(item) {
-  if(item.set !== void 0) {
+  if(item.set !== void 0 && (item.set.ranks.indexOf(6) > -1 || item.set.slug == 'legacy-of-nightmares')) {
     var hasSet = false;
     for(var i in allSets) {
       if (allSets[i].slug == item.set.slug) {

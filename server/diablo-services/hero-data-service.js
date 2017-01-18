@@ -2,7 +2,6 @@ var _ = require('lodash');
 var Promise = require('promise');
 var itemDataService = require('./item-data-service.js');
 var allHeroes = {};
-var allSets = [];
 var allItemIds = [];
 var allItems = [];
 var popularItems = [];
