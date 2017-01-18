@@ -26,9 +26,9 @@ function(app, sets) {
         }
         var popularGearSets = storeService.getStoreData('popularGearSets');
         var allItems = storeService.getStoreData('allItems');
+        console.log(popularGearSets);
         for(var i in popularGearSets) {
           var popularSet = popularGearSets[i];
-          if(popularSet.slug !== 'legacy-of-nightmares') continue;
           console.log(popularSet.slug);
           var setDetails = [];
           var setItems = {
@@ -58,7 +58,6 @@ function(app, sets) {
           _this.popularItems.averageRiftLevel = popularSet.riftLevel;
           _this.popularItems.items.push(setItems);
         }
-        console.log(popularGearSets);
       })
       socketService.on('connect', function(){
         console.log('connected')

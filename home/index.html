@@ -3,6 +3,6 @@
   <div class="container-fluid">
     <!--{{HomeCtrl.allSets['innas-mantra']}}-->
    <!--<top-items slots="HomeCtrl.allSets[HomeCtrl.testSet][5].popularItemBuild">-->
-   <item-set ng-repeat="itemSet in HomeCtrl.popularItems.items" items="itemSet"></item-set>
+   <item-set ng-repeat="itemSet in HomeCtrl.popularItems.items track by $index" items="itemSet"></item-set>
   </div>
 </div>

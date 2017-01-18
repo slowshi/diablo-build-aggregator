@@ -21,7 +21,7 @@ var checkGearValid = function checkGearValid(gearSet) {
         setCount ++;
       }
     }
-    if((setCount >= 5 && gearSet.indexOf('P3_Unique_Ring_107') > -1) || setCount >= 6 || setSlug === 'legacy-of-nightmares'){
+    if(setSlug === 'legacy-of-nightmares' || (setCount >= 5 && gearSet.indexOf('P3_Unique_Ring_107') > -1) || setCount >= 6){
       hasSet = setSlug;
     }
   }
@@ -39,7 +39,6 @@ var getHeroGear = function getHeroGear(heroData) {
   }
   gearSet = gearSet.sort();
   var hasSetSlug = checkGearValid(gearSet);
-
   var hasSet = false;
   for(var j in popularGearSets) {
     if(_.isEqual(popularGearSets[j].set, gearSet)){

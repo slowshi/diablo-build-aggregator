@@ -3,9 +3,9 @@
     <h4 class="card-title">{{key}}</h4>
   </div>
   <div class="card-text">
-    <div ng-repeat="slot in ItemSetCtrl.items">
+    <div ng-repeat="slot in ItemSetCtrl.items track by $index">
       <item-icon
-              ng-repeat="item in slot"
+              ng-repeat="item in slot track by $index"
               icon-id="{{item.icon}}"
               color="{{item.displayColor}}"
               tooltip-params="{{item.tooltipParams}}"
