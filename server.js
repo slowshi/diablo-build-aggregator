@@ -10,7 +10,7 @@ var parseHeroSetData = require('./server/diablo-services/scripts/parse-hero-set-
 
 apiService.setAccessToken(accessToken)
 .then(function(){
-  // parseHeroData.init();
+  // parseHeroData.init(true);
   parseItemData.init()
   .then(parseHeroData.init)
   .then(parseHeroSetData.init)

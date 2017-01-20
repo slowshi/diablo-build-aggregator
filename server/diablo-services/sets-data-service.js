@@ -7,8 +7,9 @@ var allSets = [];
 var allItemIds = [];
 var allItems = {};
 var heroSets = {};
-var heroGear = [];
+var allHeroSets = [];
 var popularGearSets = [];
+var brokenData = 0;
 var checkGearValid = function checkGearValid(gearSet) {
   var hasSet = '';
   if(gearSet.length < 15 || gearSet.indexOf(null) > -1) return false;
@@ -21,7 +22,7 @@ var checkGearValid = function checkGearValid(gearSet) {
         setCount ++;
       }
     }
-    if(setSlug === 'legacy-of-nightmares' || (setCount >= 5 && gearSet.indexOf('P3_Unique_Ring_107') > -1) || setCount >= 6){
+    if((setSlug === 'legacy-of-nightmares' && setCount == 2) || (setCount >= 5 && gearSet.indexOf('P3_Unique_Ring_107') > -1) || setCount >= 6){
       hasSet = setSlug;
     }
   }
@@ -40,23 +41,54 @@ var getHeroGear = function getHeroGear(heroData) {
   gearSet = gearSet.sort();
   var hasSetSlug = checkGearValid(gearSet);
   var hasSet = false;
-  for(var j in popularGearSets) {
-    if(_.isEqual(popularGearSets[j].set, gearSet)){
+  var skillList = [];
+  if(typeof heroData.skills === 'undefined'){
+    brokenData++; 
+    console.log('brokenData',brokenData);
+   return;
+  }
+  for(var j in allHeroSets) {
+    var setCheck = allHeroSets[j];
+    if(_.isEqual(setCheck.set, gearSet)){
       hasSet = true;
-      popularGearSets[j].heroes.push(heroData.id);
-      popularGearSets[j].riftLevel.push(heroData.riftLevel);
-      popularGearSets[j].riftTime.push(heroData.riftTime);
+      setCheck.heroes.push(heroData.id);
+      setCheck.riftLevel.push(heroData.riftLevel);
+      setCheck.riftTime.push(heroData.riftTime);
+      var hasSkillset = false;
+      for(var m in setCheck.skills) {
+        var popularSkills = setCheck.skills[m];
+        if(_.isEqual(popularSkills.list, heroData.skillList)){
+          popularSkills.heroes.push(heroData.id);
+          hasSkillset = true;
+        }
+      }
+      if(!hasSkillset) {
+          setCheck.skills.push({
+          list: heroData.skillList,
+          heroes: [heroData.id]
+        });
+      }
     }
   }
   if(!hasSet && hasSetSlug) {
     var newGearSet = {
       slug: hasSetSlug,
       set: gearSet,
+      skills:[{
+        list: heroData.skillList,
+        heroes: [heroData.id]
+      }],
       heroes: [heroData.id],
       riftLevel:[heroData.riftLevel],
       riftTime:[heroData.riftTime],
+      variants: {
+        1: [],
+        2: [],
+        3: [],
+        allVariant: []
+      }
     };
-    popularGearSets.push(newGearSet)
+    allHeroSets.push(newGearSet);
   }
 };
 function findAverages(data) {
@@ -85,26 +117,51 @@ function millisToMinutesAndSeconds(millis) {
 }
 
 var parsePopularGearSets = function parsePopularGearSet() {
-    for(var j in popularGearSets) {
-      var item = popularGearSets[j];
+    allHeroSets = allHeroSets.sort(function(a, b){
+      return parseInt(a.heroes.length) - parseInt(b.heroes.length);
+    }).reverse();
+    var setId = 0;
+    for(var j = 0; j < allHeroSets.length; j++) {
+      var item = allHeroSets[j];
+      item.id = setId;
       item.riftLevel = findAverages(item.riftLevel);
       item.riftTime = findAverages(item.riftTime);
-    }
-    var topSets = [];
-    popularGearSets = popularGearSets.sort(function(a, b){
-      return parseInt(a.riftLevel.max) - parseInt(b.riftLevel.max);
-    }).reverse();
-    for(var j in popularGearSets) {
-      var popularSet = popularGearSets[j];
-      for (var i in popularSet.riftTime) {
-        popularSet.riftTime[i] = millisToMinutesAndSeconds(item.riftTime[i]);
+      for (var i in item.riftTime) {
+        item.riftTime[i] = millisToMinutesAndSeconds(item.riftTime[i]);
       }
-      if(popularSet.heroes.length >= 20){
-        topSets.push(popularSet);
+      setId++;
+    }
+    var variantDiff = 1;
+    var variantCheckSets = _.cloneDeep(allHeroSets);
+    var variantsList = {};
+    var blacklistedVariants = [];
+    for(var j in allHeroSets) {
+      var gearSet = allHeroSets[j];
+      if(blacklistedVariants.indexOf(gearSet.id) > -1)continue;
+      for(var k in variantCheckSets) {
+        var variantCheckSet = variantCheckSets[k];
+        if(gearSet.id === variantCheckSet.id) continue;
+        if(blacklistedVariants.indexOf(variantCheckSet.id) > -1)continue;
+        var variantItems = getSetDifference(gearSet.set, variantCheckSet.set);
+        if(variantItems.length < 6){
+          if(typeof variantsList[gearSet.id] === 'undefined') {
+            variantsList[gearSet.id] = [];
+          }
+          if(variantsList[gearSet.id])
+          variantsList[gearSet.id].push(variantCheckSet.id);
+          blacklistedVariants.push(variantCheckSet.id)
+        }
       }
     }
-    console.log(popularGearSets.length)
-    // popularGearSets = topSets;
+    console.log(variantsList);
+    var allKeys = _.keys(variantsList);
+    console.log(allKeys);
+    for(var i in allHeroSets){
+      if(allKeys.indexOf(allHeroSets[i].id.toString()) > -1) {
+        popularGearSets.push(allHeroSets[i]);
+      }
+    }
+    //popularGearSets = topSets;
 }
 var parseHeroSets = function parseHeroSets() {
   for(var i in allHeroes) {
@@ -112,12 +169,28 @@ var parseHeroSets = function parseHeroSets() {
     getHeroGear(heroData);
   }
 }
-var groupSets = function groupSets() {
-  var groupedPopularSets = [];
-  for(var i in allSets){
-    var gearSet = allSets[i];
-    
+var bestSets = {};
+var getSetDifference = function getSetDifference(set, compare) {
+  var setCount = [];
+  for(var j in compare) {
+    if(set.indexOf(compare[j]) == -1){
+      setCount.push(compare[j]);
+    }
   }
+  return setCount;
+}
+var groupSets = function groupSets() {
+  var groupedPopularSets = {};
+  for(var i in popularGearSets){
+    var gearSet = popularGearSets[i];
+    if(typeof groupedPopularSets[gearSet.slug] === 'undefined'){
+      groupedPopularSets[gearSet.slug] = [];
+    }
+    groupedPopularSets[gearSet.slug].push(gearSet);
+  }
+ 
+  popularGearSets = groupedPopularSets;
+  console.log(popularGearSets)
 };
 var init = function init(){
   return new Promise(function (resolve, reject) {

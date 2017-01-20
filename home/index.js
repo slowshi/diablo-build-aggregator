@@ -7,8 +7,6 @@ define([
   'socket-service',
 ],
 function(app, sets) {
-  var json4 = JSON.parse(sets);
-  console.log(json4);
   app.registerController('HomeController', ['$scope', 'cssInjector', 'socketService',
   'storeService',
     function($scope, cssInjector, socketService, storeService) {
@@ -18,18 +16,21 @@ function(app, sets) {
       _this.popularItems = {
         items: [],
         averageRiftLevel: 0,
-        averageRiftTime: 0
+        averageRiftTime: 0,
+        skills: [],
       };
       socketService.on('dataDump',function(data){
         for(var i in data){
           storeService.updateStoreData(i,data[i]);
         }
         var popularGearSets = storeService.getStoreData('popularGearSets');
+        var setByName = popularGearSets['monkey-kings-garb'];
         var allItems = storeService.getStoreData('allItems');
-        console.log(popularGearSets);
-        for(var i in popularGearSets) {
-          var popularSet = popularGearSets[i];
-          console.log(popularSet.slug);
+
+        for(var i in setByName) {
+          var popularSet = setByName[i];
+          console.log(popularSet);
+          if(popularSet.slug !== 'monkey-kings-garb') continue;
           var setDetails = [];
           var setItems = {
             armor: [],
@@ -55,10 +56,13 @@ function(app, sets) {
           // var averageRiftTime = Math.floor(_.sum(popularSet.riftTime)/popularSet.riftTime.length);
           // var averageRiftLevel = Math.floor(_.sum(popularSet.riftLevel)/popularSet.riftLevel.length);
           _this.popularItems.averageRiftTime = popularSet.riftTime;
-          _this.popularItems.averageRiftLevel = popularSet.riftLevel;
+          _this.popularItems.averageRiftTime = popularSet.riftTime;
+          _this.popularItems.skills.push(popularSet.skills);
           _this.popularItems.items.push(setItems);
         }
+        console.log(popularGearSets);
       })
+      this.allSets = JSON.parse(sets);
       socketService.on('connect', function(){
         console.log('connected')
       });

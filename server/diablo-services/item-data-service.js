@@ -4,7 +4,7 @@ var allSets = [];
 var allItems = {};
 
 var findSets = function getHeroItems(item) {
-  if(item.set !== void 0 && (item.set.ranks.indexOf(6) > -1 || item.set.slug == 'legacy-of-nightmares')) {
+  if(item.set !== void 0 && (item.set.ranks.indexOf(6) > -1 || item.set.slug === 'legacy-of-nightmares')) {
     var hasSet = false;
     for(var i in allSets) {
       if (allSets[i].slug == item.set.slug) {

@@ -13,6 +13,7 @@ var setSocket = function setSocket(connectedIo) {
       socket.emit('dataDump',{
         popularGearSets: setsDataService.getPopularGearSets(),
         // allHeroes: heroDataService.getAllHeroes(),
+        allSkills: heroDataService.getAllSkills(),
         allItems: itemDataService.getAllItems(),
       })
       socket.on('getHeroData',getHeroData);

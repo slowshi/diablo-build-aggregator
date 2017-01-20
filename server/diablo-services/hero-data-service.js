@@ -5,6 +5,7 @@ var allHeroes = {};
 var allItemIds = [];
 var allItems = [];
 var popularItems = [];
+var allSkills = {};
 var getEndpoint = function getEndpoint(ladderData) {
   var player = ladderData.player;
   var endpoint = 'https://us.api.battle.net/d3/profile/'+  
@@ -85,11 +86,45 @@ var parseAllItemIds = function parseAllItemIds(data) {
   //   }
   // }
 };
-
+var parseAllSkillIds = function parseAllSkillIds(data) {
+  var actives = data.skills.active;
+  var passives = data.skills.passive;
+  var playerSkills = [];
+  if(typeof actives !== 'undefined') {
+    for(var i in actives) {
+      var active = actives[i];
+      playerSkills.push(active.skill.slug);
+      if(typeof allSkills[active.skill.slug] === 'undefined'){
+        active.skill.type = 'active'
+        allSkills[active.skill.slug] = active.skill;
+      }
+      if(typeof active.rune !== 'undefined'){
+       playerSkills.push(active.rune.slug);
+        if(typeof allSkills[active.rune.slug] === 'undefined'){
+          active.rune.type = 'rune'
+          allSkills[active.rune.slug] = active.rune;
+        }
+      }
+    }
+  }
+  if(typeof passives !== 'undefined') {
+    for(var j in passives) {
+      var passive = passives[j];
+      playerSkills.push(passive.skill.slug);
+      if(typeof allSkills[passive.skill.slug] == 'undefined'){
+        passive.skill.type = 'passive';   
+        allSkills[passive.skill.slug] = passive.skill;
+      }
+    }
+  }
+  return playerSkills.sort();
+}
 var parseHero = function parseHero(data) {
   return new Promise(function (resolve, reject) {
-    allHeroes[data.id] = data;
     parseAllItemIds(data);
+    var skillsList = parseAllSkillIds(data);
+    data.skillList = skillsList;
+    allHeroes[data.id] = data;
     resolve();
   });
 }
@@ -108,9 +143,13 @@ var getAllItemIds = function getAllItemIds() {
 var getPopularItems = function getPopularItems() {
   return _.cloneDeep(popularItems);
 }
+var getAllSkills = function getAllSkills() {
+  return _.cloneDeep(allSkills);
+}
 module.exports = {
   getAllHeroes: getAllHeroes,
   getAllItemIds: getAllItemIds,
+  getAllSkills: getAllSkills,
   getPopularItems: getPopularItems,
   parseHero: parseHero,
   getEndpoint: getEndpoint,

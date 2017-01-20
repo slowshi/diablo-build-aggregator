@@ -38,8 +38,8 @@ var apiTransformationObject = {
       paragonLevel: true,
       hardcore: true,
       seasonal: true,
-      skill:{
-        active: {
+      skills:{
+        '*': {
           '*' : {
             skill: {
               slug: true,
