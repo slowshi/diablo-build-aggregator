@@ -1,4 +1,4 @@
-define(['app'], function(app) {
+define(['app', 'states'], function(app, states) {
   var appInit = function() {
     var stateProvider;
     var couchPotatoProvider;
@@ -27,6 +27,7 @@ define(['app'], function(app) {
         $rootScope.$state = $state;
         $rootScope.$stateParams = $stateParams;
         stateProvider.state('home', {
+          url:'/{setId}',
           templateUrl: 'home/index.html',
           resolve: {
             deps: couchPotatoProvider
@@ -34,6 +35,33 @@ define(['app'], function(app) {
           },
           controller: 'HomeController as HomeCtrl'
         });
+        // $state.go('home');
+        // stateProvider.state('root', {
+        //   url: '',
+        //   views: {
+        //     'main@': {
+        //       templateUrl: '/home/index.html',
+        //       resolve: {
+        //         deps: couchPotatoProvider.
+        //         resolveDependencies(['/home/index.js']),
+        //       },
+        //         controller: 'HomeController as HomeCtrl',
+        //     },
+        //   },
+        // });
+
+        // for(var key in states) {
+        //   var state = states[key];
+        //   stateProvider.state(key, {
+        //     url: state.url,
+        //     templateUrl: '/' + state.path + '/index.html',
+        //     resolve:{
+        //       deps: couchPotatoProvider
+        //       .resolveDependencies(['/'+ state.path + '/index.js']),
+        //     },
+        //     controller: state.controller,
+        //   });
+        // }
         $state.go('home');
       }]);
     var bootstrapApplication = (function() {

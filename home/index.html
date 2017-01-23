@@ -1,28 +1,29 @@
 <h4 class="text-xs-center">Starter App</h4>
-<div class="game-window">
-  <div class="container-fluid">
-    <div class="row">
-      <!--{{HomeCtrl.allSets['innas-mantra']}}-->
-    <!--<top-items slots="HomeCtrl.allSets[HomeCtrl.testSet][5].popularItemBuild">-->
-      <div class="col-md-3">
-        <div class="thumbnail">
-          <div class="thumbnail icon-portrait icon-frame"> 
-            <img class="img-responsive img-center" src="js/characters/monk_male.png">
-          </div>
+<div class="container-fluid">
+  <div class="row">
+    <!--{{HomeCtrl.allSets['innas-mantra']}}-->
+  <!--<top-items slots="HomeCtrl.allSets[HomeCtrl.testSet][5].popularItemBuild">-->
+    <div class="col-sm-3">
+      <div class="thumbnail">
+        <div class="thumbnail icon-portrait icon-frame"> 
+          <img class="img-responsive img-center" src="js/characters/monk_male.png">
         </div>
-        <div xmlns="http://www.w3.org/1999/xhtml" class="section-header has-icon">
-          <h3 class="header-3">sets</h3>
-          <span class="icon sword"></span>
-        </div>
-        <ul>
-          <li ng-repeat="set in HomeCtrl.allSets">
-            <a>{{set.name}}</a>
-          </li>
-        </ul>
       </div>
-      
-      <div class="col-md-9">
-        <item-set ng-repeat="itemSet in HomeCtrl.popularItems.items track by $index" items="itemSet"></item-set>
+      <div xmlns="http://www.w3.org/1999/xhtml" class="section-header has-icon">
+        <h3 class="header-3">sets</h3>
+        <span class="icon sword"></span>
+      </div>
+      <ul>
+        <li ng-repeat="set in HomeCtrl.allSets">
+          <a href="#" ng-click="HomeCtrl.selectSet(set.slug)">{{set.name}}</a>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="col-sm-9">
+      <div ng-repeat="set in HomeCtrl.popularItems track by $index">
+        <skill-set skills="set.skills"></skill-set>
+        <item-set items="set.items"></item-set>
       </div>
     </div>
   </div>

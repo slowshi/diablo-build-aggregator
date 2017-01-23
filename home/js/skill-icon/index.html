@@ -1,0 +1,23 @@
+<!--<a ng-click="SkillIconCtrl.preventDefault($event);" href="http://us.battle.net/d3/en/{{SkillIconCtrl.tooltipParams}}">
+<span class="d3-icon d3-icon-skill d3-icon-skill-{{SkillIconCtrl.size}}  d3-icon-skill-{{SkillIconCtrl.color}}">
+  <span class="icon-skill-gradient">
+    <span class="icon-skill-inner icon-skill-default" 
+      style="background-image: url({{SkillIconCtrl.skillUrl}});">
+    </span>
+  </span>
+</span>
+</a>-->
+<div class="row">
+  <a class="col-sm-12 col-centered" xmlns="http://www.w3.org/1999/xhtml" href="{{SkillIconCtrl.skillTooltip}}" rel="np">
+    <span class="d3-icon d3-icon-skill d3-icon-skill-42 " style="background-image: url({{SkillIconCtrl.skillIcon}});">
+      <span class="frame"></span>
+    </span>
+  </a>
+  <div class="col-sm-12 col-centered">
+    <a class="center" xmlns="http://www.w3.org/1999/xhtml" href="{{SkillIconCtrl.skillTooltip}}#a" rel="np">
+      <span class="d3-icon d3-icon-rune d3-icon-rune-medium">
+        <span class="rune-a"></span>
+      </span>
+    </a>
+  </div>
+</div>

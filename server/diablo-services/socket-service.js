@@ -10,17 +10,19 @@ var setSocket = function setSocket(connectedIo) {
     io = connectedIo;
     io.sockets.on('connection',function(socket){
       console.log('expose endpoints to socket');
-      socket.emit('dataDump',{
-        popularGearSets: setsDataService.getPopularGearSets(),
-        // allHeroes: heroDataService.getAllHeroes(),
-        allSkills: heroDataService.getAllSkills(),
-        allItems: itemDataService.getAllItems(),
-      })
+      socket.on('getInitialData', getInitialData)
       socket.on('getHeroData',getHeroData);
       socket.on('getHeroSets',getHeroSets);
       socket.on('getPopularGearSets',getPopularGearSets);
       socket.on('getItems', getItems);
     });
+    var getInitialData = function getInitialData() {
+      io.sockets.emit('getInitialData',{
+        popularGearSets: setsDataService.getPopularGearSets(),
+        allSkills: heroDataService.getAllSkills(),
+        allItems: itemDataService.getAllItems(),
+      })
+    }
     var getHeroData = function getHeroData(heroId) {
       io.sockets.emit('getHeroData',heroDataService.getHeroData(heroId));
     }

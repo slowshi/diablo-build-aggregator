@@ -97,9 +97,11 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
       if(typeof allSkills[active.skill.slug] === 'undefined'){
         active.skill.type = 'active'
         allSkills[active.skill.slug] = active.skill;
+        allSkills[active.skill.slug].quickTip = 
+          'class/'+ data.class +'/active/' + active.skill.slug;
       }
       if(typeof active.rune !== 'undefined'){
-       playerSkills.push(active.rune.slug);
+      //  playerSkills.push(active.rune.slug);
         if(typeof allSkills[active.rune.slug] === 'undefined'){
           active.rune.type = 'rune'
           allSkills[active.rune.slug] = active.rune;
@@ -110,14 +112,14 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
   if(typeof passives !== 'undefined') {
     for(var j in passives) {
       var passive = passives[j];
-      playerSkills.push(passive.skill.slug);
+      // playerSkills.push(passive.skill.slug);
       if(typeof allSkills[passive.skill.slug] == 'undefined'){
         passive.skill.type = 'passive';   
         allSkills[passive.skill.slug] = passive.skill;
       }
     }
   }
-  return playerSkills.sort();
+  return playerSkills;
 }
 var parseHero = function parseHero(data) {
   return new Promise(function (resolve, reject) {

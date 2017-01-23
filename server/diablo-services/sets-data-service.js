@@ -38,7 +38,6 @@ var getHeroGear = function getHeroGear(heroData) {
   if(heroData.legendaryPowers !== void 0) {
     gearSet = gearSet.concat(heroData.legendaryPowers)
   }
-  gearSet = gearSet.sort();
   var hasSetSlug = checkGearValid(gearSet);
   var hasSet = false;
   var skillList = [];
@@ -49,7 +48,7 @@ var getHeroGear = function getHeroGear(heroData) {
   }
   for(var j in allHeroSets) {
     var setCheck = allHeroSets[j];
-    if(_.isEqual(setCheck.set, gearSet)){
+    if(getSetDifference(setCheck.set, gearSet).length == 0){
       hasSet = true;
       setCheck.heroes.push(heroData.id);
       setCheck.riftLevel.push(heroData.riftLevel);
@@ -57,7 +56,7 @@ var getHeroGear = function getHeroGear(heroData) {
       var hasSkillset = false;
       for(var m in setCheck.skills) {
         var popularSkills = setCheck.skills[m];
-        if(_.isEqual(popularSkills.list, heroData.skillList)){
+        if(getSetDifference(popularSkills.list, heroData.skillList).length == 0){
           popularSkills.heroes.push(heroData.id);
           hasSkillset = true;
         }
@@ -130,6 +129,10 @@ var parsePopularGearSets = function parsePopularGearSet() {
         item.riftTime[i] = millisToMinutesAndSeconds(item.riftTime[i]);
       }
       setId++;
+
+      item.skills = item.skills.sort(function(a, b){
+        return parseInt(a.heroes.length) - parseInt(b.heroes.length);
+      }).reverse();
     }
     var variantDiff = 1;
     var variantCheckSets = _.cloneDeep(allHeroSets);
@@ -147,7 +150,6 @@ var parsePopularGearSets = function parsePopularGearSet() {
           if(typeof variantsList[gearSet.id] === 'undefined') {
             variantsList[gearSet.id] = [];
           }
-          if(variantsList[gearSet.id])
           variantsList[gearSet.id].push(variantCheckSet.id);
           blacklistedVariants.push(variantCheckSet.id)
         }

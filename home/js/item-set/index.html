@@ -1,12 +1,8 @@
-<div class="card">
-  <div class="card-text">
-    <div ng-repeat="slot in ItemSetCtrl.items track by $index">
-      <item-icon
-              ng-repeat="item in slot track by $index"
-              icon-id="{{item.icon}}"
-              color="{{item.displayColor}}"
-              tooltip-params="{{item.tooltipParams}}"
-              size="small"></item-icon>
-    </div>
-  </div>
+<div ng-repeat="slot in ItemSetCtrl.items track by $index">
+  <item-icon
+          ng-repeat="item in slot track by $index"
+          icon-id="{{item.icon}}"
+          color="{{item.displayColor}}"
+          tooltip-params="{{item.tooltipParams}}"
+          size="small"></item-icon>
 </div>

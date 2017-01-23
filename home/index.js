@@ -1,37 +1,41 @@
 define([
   'app',
   'text!item-data/sets.json',
+  'lodash',
+  'd3tooltips',
   './js/item-icon/index.js',
   './js/item-set/index.js',
   './js/top-items/index.js',
+  './js/skill-icon/index.js',
+  './js/skill-set/index.js',
   'socket-service',
 ],
-function(app, sets) {
+function(app, sets, _, test) {
+  console.log("BNET",Bnet);
+  console.log("WINDOWBNET", window.Bnet);
   app.registerController('HomeController', ['$scope', 'cssInjector', 'socketService',
-  'storeService',
-    function($scope, cssInjector, socketService, storeService) {
-      cssInjector.add('home/index.css');
+  'storeService', '$stateParams', '$state',
+    function($scope, cssInjector, socketService, storeService, $stateParams, $state) {
       cssInjector.add('js/vendors/bootstrap/4.0.0/css/bootstrap.min.css');
+      cssInjector.add('home/index.css');
       var _this = this;
-      _this.popularItems = {
-        items: [],
-        averageRiftLevel: 0,
-        averageRiftTime: 0,
-        skills: [],
-      };
-      socketService.on('dataDump',function(data){
-        for(var i in data){
-          storeService.updateStoreData(i,data[i]);
-        }
-        var popularGearSets = storeService.getStoreData('popularGearSets');
-        var setByName = popularGearSets['monkey-kings-garb'];
-        var allItems = storeService.getStoreData('allItems');
+      var popularGearSets;
+      var allItems;
+      var allSkills
+      _this.popularItems = [];
+      _this.currentSet = 'raiment-of-a-thousand-storms';
+      _this.selectSet = function(selectedSet) {
+        $state.go('.', {setId: selectedSet});
+      }
+      _this.updateGearSets = function updateGearSets() {
+        if(_.isEmpty(popularGearSets)) return;
+        var setByName = popularGearSets[_this.currentSet];
+        _this.popularItems = [];
 
         for(var i in setByName) {
           var popularSet = setByName[i];
-          console.log(popularSet);
-          if(popularSet.slug !== 'monkey-kings-garb') continue;
           var setDetails = [];
+          var setSkills = [];
           var setItems = {
             armor: [],
             jewelery: [],
@@ -53,15 +57,36 @@ function(app, sets) {
               }
             }
           }
+          for(var k in popularSet.skills[0].list) {
+            var skillData = allSkills[popularSet.skills[0].list[k]];
+            setSkills.push(skillData);
+          }
           // var averageRiftTime = Math.floor(_.sum(popularSet.riftTime)/popularSet.riftTime.length);
           // var averageRiftLevel = Math.floor(_.sum(popularSet.riftLevel)/popularSet.riftLevel.length);
-          _this.popularItems.averageRiftTime = popularSet.riftTime;
-          _this.popularItems.averageRiftTime = popularSet.riftTime;
-          _this.popularItems.skills.push(popularSet.skills);
-          _this.popularItems.items.push(setItems);
+          // _this.popularItems.averageRiftTime = popularSet.riftTime;
+          // _this.popularItems.averageRiftTime = popularSet.riftTime;
+          var setObj = {
+            skills: setSkills,
+            items: setItems,
+          }
+          _this.popularItems.push(setObj);
         }
-        console.log(popularGearSets);
+          console.log(_this.popularItems);
+      }
+      socketService.emit('getInitialData');
+      socketService.on('getInitialData',function(data){
+        console.log(data);
+        for(var i in data){
+          storeService.updateStoreData(i,data[i]);
+        }
+        popularGearSets = storeService.getStoreData('popularGearSets');
+        allItems = storeService.getStoreData('allItems');
+        allSkills = storeService.getStoreData('allSkills');
+        console.log(allSkills);
+        _this.currentSet = $stateParams.setId || 'raiment-of-a-thousand-storms';
+        _this.updateGearSets();
       })
+      _this.updateGearSets();
       this.allSets = JSON.parse(sets);
       socketService.on('connect', function(){
         console.log('connected')
