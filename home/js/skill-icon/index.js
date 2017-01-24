@@ -3,7 +3,7 @@ define([
   'text!/home/js/skill-icon/index.html',
 ],
 function(app, html) {
-  console.log(Bnet);
+  (Bnet);
   app.registerDirective('skillIcon', [function() {
     return {
       restrict: 'E',
@@ -21,12 +21,12 @@ function(app, html) {
 
   app.registerController('SkillIconController', ['$scope', 'cssInjector', 
     function($scope, cssInjector) {
-      console.log(typeof this.skill)
+      (typeof this.skill)
       var stub = 'http://media.blizzard.com/d3/icons/skills/42/'
       var tooltipStub = 'http://us.battle.net/d3/en/'
       this.skillIcon = stub + this.skill.icon + '.png';
       this.skillTooltip = tooltipStub +  this.skill.quickTip;
-      console.log(this.skillTooltip);
+      (this.skillTooltip);
       this.skillRune = 'a';
       
       this.preventDefault = function preventDefault($event) {

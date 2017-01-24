@@ -89,11 +89,20 @@ var parseAllItemIds = function parseAllItemIds(data) {
 var parseAllSkillIds = function parseAllSkillIds(data) {
   var actives = data.skills.active;
   var passives = data.skills.passive;
-  var playerSkills = [];
+  var skillObj = {
+    skills:[],
+    playerSkills: {
+      actives:[],
+      passives:[]
+    }
+  };
   if(typeof actives !== 'undefined') {
     for(var i in actives) {
       var active = actives[i];
-      playerSkills.push(active.skill.slug);
+      var playerSkill = {
+        skill:'',
+        rune:''
+      };
       if(typeof allSkills[active.skill.slug] === 'undefined'){
         active.skill.type = 'active'
         allSkills[active.skill.slug] = active.skill;
@@ -101,31 +110,54 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
           'class/'+ data.class +'/active/' + active.skill.slug;
       }
       if(typeof active.rune !== 'undefined'){
-      //  playerSkills.push(active.rune.slug);
+        skillObj.skills.push(active.rune.slug);
+        var splitSlug = active.rune.slug.split('-');
+        var runeName = splitSlug[splitSlug.length-1];
+        playerSkill.rune = runeName;
         if(typeof allSkills[active.rune.slug] === 'undefined'){
           active.rune.type = 'rune'
           allSkills[active.rune.slug] = active.rune;
         }
       }
+      skillObj.skills.push(active.skill.slug);
+      playerSkill.skill = active.skill.slug;
+      skillObj.playerSkills.actives.push(playerSkill);
     }
   }
   if(typeof passives !== 'undefined') {
     for(var j in passives) {
       var passive = passives[j];
-      // playerSkills.push(passive.skill.slug);
+      skillObj.skills.push(passive.skill.slug);
+      skillObj.playerSkills.passives.push(passive.skill.slug);
       if(typeof allSkills[passive.skill.slug] == 'undefined'){
         passive.skill.type = 'passive';   
         allSkills[passive.skill.slug] = passive.skill;
       }
     }
   }
-  return playerSkills;
+  return skillObj;
+}
+var parseGearIds = function parseGearIds(heroData) {
+  var gearSet = {};
+  for(var itemKey in heroData.items) {
+    var item = heroData.items[itemKey];
+    gearSet[itemKey] = item.id;
+  }
+  if(heroData.legendaryPowers !== void 0) {
+    for(var i in heroData.legendaryPowers){
+      gearSet['legendary' + i] = heroData.legendaryPowers[i];
+    }
+  }
+  return gearSet;
 }
 var parseHero = function parseHero(data) {
   return new Promise(function (resolve, reject) {
     parseAllItemIds(data);
     var skillsList = parseAllSkillIds(data);
-    data.skillList = skillsList;
+    data.playerSkills = skillsList.playerSkills;
+    data.skillList = skillsList.skills;
+    var heroGear = parseGearIds(data);
+    data.gearList = heroGear;
     allHeroes[data.id] = data;
     resolve();
   });

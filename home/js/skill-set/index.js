@@ -23,7 +23,7 @@ function(app, html) {
   app.registerController('SkillSetController', ['$scope', 'cssInjector',
     function($scope, cssInjector) {
       var _this = this;
-      console.log(_this.skills);
+      (_this.skills);
       _this.parsedData = [];
     }]);
 });

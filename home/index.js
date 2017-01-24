@@ -11,8 +11,8 @@ define([
   'socket-service',
 ],
 function(app, sets, _, test) {
-  console.log("BNET",Bnet);
-  console.log("WINDOWBNET", window.Bnet);
+  ("BNET",Bnet);
+  ("WINDOWBNET", window.Bnet);
   app.registerController('HomeController', ['$scope', 'cssInjector', 'socketService',
   'storeService', '$stateParams', '$state',
     function($scope, cssInjector, socketService, storeService, $stateParams, $state) {
@@ -71,28 +71,28 @@ function(app, sets, _, test) {
           }
           _this.popularItems.push(setObj);
         }
-          console.log(_this.popularItems);
+          (_this.popularItems);
       }
       socketService.emit('getInitialData');
       socketService.on('getInitialData',function(data){
-        console.log(data);
+        (data);
         for(var i in data){
           storeService.updateStoreData(i,data[i]);
         }
         popularGearSets = storeService.getStoreData('popularGearSets');
         allItems = storeService.getStoreData('allItems');
         allSkills = storeService.getStoreData('allSkills');
-        console.log(allSkills);
+        (allSkills);
         _this.currentSet = $stateParams.setId || 'raiment-of-a-thousand-storms';
         _this.updateGearSets();
       })
       _this.updateGearSets();
       this.allSets = JSON.parse(sets);
       socketService.on('connect', function(){
-        console.log('connected')
+        ('connected')
       });
       socketService.on('disconnect', function(){
-        console.log("NO")
+        ("NO")
       });
     }]);
 });
