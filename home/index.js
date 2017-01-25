@@ -41,6 +41,19 @@ function(app, sets, _, test) {
             jewelery: [],
             weapons: []
           };
+          for(var k in popularSet.gearList) { 
+            popularSet.gearList[k] = allItems[popularSet.gearList[k]];
+          }
+          for(var m in popularSet.skills) {
+            var skillObj = popularSet.skills[m].skillList;
+            console.log(skillObj);
+            for(var p in skillObj.actives) {
+              skillObj.actives[p].skill = allSkills[skillObj.actives[p].skill];
+            }
+            for(var o in skillObj.passives) {
+              skillObj.passives[o] = allSkills[skillObj.passives[o]];
+            }
+          }
           for(var j in popularSet.set) {
             var itemData = allItems[popularSet.set[j]];
             if(itemData.slots !== void 0){
@@ -61,6 +74,7 @@ function(app, sets, _, test) {
             var skillData = allSkills[popularSet.skills[0].list[k]];
             setSkills.push(skillData);
           }
+          console.log(popularSet);
           // var averageRiftTime = Math.floor(_.sum(popularSet.riftTime)/popularSet.riftTime.length);
           // var averageRiftLevel = Math.floor(_.sum(popularSet.riftLevel)/popularSet.riftLevel.length);
           // _this.popularItems.averageRiftTime = popularSet.riftTime;
@@ -68,10 +82,12 @@ function(app, sets, _, test) {
           var setObj = {
             skills: setSkills,
             items: setItems,
+            popularGear: popularSet.gearList,
+            popularSkills: popularSet.skills
           }
           _this.popularItems.push(setObj);
         }
-          (_this.popularItems);
+      console.log(_this.popularItems);
       }
       socketService.emit('getInitialData');
       socketService.on('getInitialData',function(data){
@@ -82,17 +98,14 @@ function(app, sets, _, test) {
         popularGearSets = storeService.getStoreData('popularGearSets');
         allItems = storeService.getStoreData('allItems');
         allSkills = storeService.getStoreData('allSkills');
-        (allSkills);
         _this.currentSet = $stateParams.setId || 'raiment-of-a-thousand-storms';
         _this.updateGearSets();
       })
       _this.updateGearSets();
       this.allSets = JSON.parse(sets);
       socketService.on('connect', function(){
-        ('connected')
       });
       socketService.on('disconnect', function(){
-        ("NO")
       });
     }]);
 });

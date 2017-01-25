@@ -14,20 +14,18 @@ function(app, html) {
         return html;
       },
       bindToController: {
-        skill: '=?',
+        skillData: '=?',
       }
     };
   }]);
 
   app.registerController('SkillIconController', ['$scope', 'cssInjector', 
     function($scope, cssInjector) {
-      (typeof this.skill)
       var stub = 'http://media.blizzard.com/d3/icons/skills/42/'
       var tooltipStub = 'http://us.battle.net/d3/en/'
-      this.skillIcon = stub + this.skill.icon + '.png';
-      this.skillTooltip = tooltipStub +  this.skill.quickTip;
-      (this.skillTooltip);
-      this.skillRune = 'a';
+      this.skillIcon = stub + this.skillData.skill.icon + '.png';
+      this.skillTooltip = tooltipStub +  this.skillData.skill.quickTip;
+      this.skillRune = this.skillData.rune;
       
       this.preventDefault = function preventDefault($event) {
         $event.preventDefault()

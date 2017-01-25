@@ -2,6 +2,7 @@ define([
   'app',
   'text!/home/js/skill-set/index.html',
   '../skill-icon/index.js',
+  '../passive-icon/index.js',
 ],
 function(app, html) {
 
@@ -22,8 +23,6 @@ function(app, html) {
 
   app.registerController('SkillSetController', ['$scope', 'cssInjector',
     function($scope, cssInjector) {
-      var _this = this;
-      (_this.skills);
-      _this.parsedData = [];
+
     }]);
 });

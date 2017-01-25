@@ -41,6 +41,7 @@ var getHeroGear = function getHeroGear(heroData) {
     gearSet = gearSet.concat(heroData.legendaryPowers)
   }
   var hasSetSlug = checkGearValid(gearSet);
+  if(heroData.skillList.length < 16)return;
   var hasSet = false;
   var skillList = [];
   if(typeof heroData.skills === 'undefined'){
@@ -66,6 +67,7 @@ var getHeroGear = function getHeroGear(heroData) {
       if(!hasSkillset) {
           setCheck.skills.push({
           list: heroData.skillList,
+          skillList: heroData.playerSkills,
           heroes: [heroData.id]
         });
       }
@@ -75,8 +77,10 @@ var getHeroGear = function getHeroGear(heroData) {
     var newGearSet = {
       slug: hasSetSlug,
       set: gearSet,
+      gearList: heroData.gearList,
       skills:[{
         list: heroData.skillList,
+        skillList: heroData.playerSkills,
         heroes: [heroData.id]
       }],
       heroes: [heroData.id],
@@ -142,7 +146,7 @@ var parsePopularGearSets = function parsePopularGearSet() {
         if(gearSet.id === variantCheckSet.id) continue;
         if(blacklistedVariants.indexOf(variantCheckSet.id) > -1)continue;
         var variantItems = getSetDifference(gearSet.set, variantCheckSet.set);
-        if(variantItems.length < 5){
+        if(variantItems.length < 6){
           if(typeof variantsList[gearSet.id] === 'undefined') {
             variantsList[gearSet.id] = [];
           }
@@ -161,7 +165,7 @@ var parsePopularGearSets = function parsePopularGearSet() {
     //console.log(popularGearSets);
 }
 var getSkillSets = function getSkillSets(heroData) {
-  console.log(heroData);
+  //console.log(heroData);
 };
 
 var parseHeroSets = function parseHeroSets() {

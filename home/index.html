@@ -22,8 +22,8 @@
     
     <div class="col-sm-9">
       <div ng-repeat="set in HomeCtrl.popularItems track by $index">
-        <skill-set skills="set.skills"></skill-set>
         <item-set items="set.items"></item-set>
+        <skill-set ng-repeat="skills in set.popularSkills" skills="skills.skillList"></skill-set>
       </div>
     </div>
   </div>

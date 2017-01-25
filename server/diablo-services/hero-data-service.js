@@ -103,6 +103,7 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
         skill:'',
         rune:''
       };
+      skillObj.skills.push(active.skill.slug);
       if(typeof allSkills[active.skill.slug] === 'undefined'){
         active.skill.type = 'active'
         allSkills[active.skill.slug] = active.skill;
@@ -119,7 +120,6 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
           allSkills[active.rune.slug] = active.rune;
         }
       }
-      skillObj.skills.push(active.skill.slug);
       playerSkill.skill = active.skill.slug;
       skillObj.playerSkills.actives.push(playerSkill);
     }
@@ -132,6 +132,8 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
       if(typeof allSkills[passive.skill.slug] == 'undefined'){
         passive.skill.type = 'passive';   
         allSkills[passive.skill.slug] = passive.skill;
+        allSkills[passive.skill.slug].quickTip = 
+          'class/'+ data.class +'/passive/' + passive.skill.slug;
       }
     }
   }

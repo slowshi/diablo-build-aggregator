@@ -1,7 +1,13 @@
 <div class="row">
   <skill-icon 
     class="col-sm-1"
-    ng-repeat="skill in SkillSetCtrl.skills track by $index"
-    skill="skill">
+    ng-repeat="skillSet in SkillSetCtrl.skills.actives track by $index"
+    skill-data="skillSet">
   </skill-icon>
+</div>
+<div class="row">
+  <passive-icon
+    class="col-sm-1"
+    ng-repeat="passiveSet in SkillSetCtrl.skills.passives track by $index"
+    passive-data="passiveSet"></passive-icon>
 </div>
