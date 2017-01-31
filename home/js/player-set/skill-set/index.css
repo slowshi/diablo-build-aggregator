@@ -1,0 +1,14 @@
+skill-set .skill-list {
+  display: flex;
+}
+skill-set .skill-icon {
+  flex:1;
+  margin:5px;
+}
+skill-set .passive-list {
+  display: flex;
+  justify-content:center;
+}
+skill-set .passive-icon {
+  margin:5px;
+}

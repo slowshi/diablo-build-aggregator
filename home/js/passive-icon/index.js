@@ -21,11 +21,9 @@ function(app, html) {
 
   app.registerController('PassiveIconController', ['$scope', 'cssInjector', 
     function($scope, cssInjector) {
-      console.log(this.passiveData)
       var stub = 'http://media.blizzard.com/d3/icons/skills/42/'
       var tooltipStub = 'http://us.battle.net/d3/en/'
       this.passiveIcon = stub + this.passiveData.icon + '.png';
-      console.log(this.passiveIcon);
       this.passiveTooltip = tooltipStub +  this.passiveData.quickTip;
       
       this.preventDefault = function preventDefault($event) {

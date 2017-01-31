@@ -13,10 +13,8 @@ function(app, html) {
         return html;
       },
       bindToController: {
-        iconId: '@?',
+        itemData:"=?",
         size:'@?',
-        color:'@?',
-        tooltipParams: '@?'
       }
     };
   }]);
@@ -24,8 +22,10 @@ function(app, html) {
   app.registerController('ItemIconController', ['$scope', 'cssInjector', 
     function($scope, cssInjector) {
       this.size = this.size || 'large';
+      this.color = this.itemData.displayColor;
+      this.tooltipParams = this.itemData.tooltipParams;
       var stub = 'http://media.blizzard.com/d3/icons/items/'
-      this.itemUrl = stub + this.size + '/' + this.iconId + '.png';
+      this.itemUrl = stub + this.size + '/' + this.itemData.icon + '.png';
       this.preventDefault = function preventDefault($event) {
         $event.preventDefault()
       }

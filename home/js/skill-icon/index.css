@@ -1,0 +1,10 @@
+skill-icon .skill-continainer {
+  display: flex;
+  flex-flow: column;
+}
+skill-icon .skill-slot {
+  flex:1;
+}
+skill-icon .rune-slot {
+  flex:1;
+}

@@ -1,8 +1,9 @@
 define([
   'app',
   'text!/home/js/skill-icon/index.html',
+  'text!/home/js/skill-icon/index.css',
 ],
-function(app, html) {
+function(app, html, css) {
   (Bnet);
   app.registerDirective('skillIcon', [function() {
     return {
@@ -11,7 +12,7 @@ function(app, html) {
       controller: 'SkillIconController',
       controllerAs: 'SkillIconCtrl',
       template: function() {
-        return html;
+        return html + '<style>' + css + '</style>';
       },
       bindToController: {
         skillData: '=?',

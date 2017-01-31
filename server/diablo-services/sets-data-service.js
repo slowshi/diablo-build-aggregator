@@ -10,6 +10,7 @@ var allHeroSets = [];
 var popularGearSets = [];
 var popularSkillSets = [];
 var brokenData = 0;
+
 var checkGearValid = function checkGearValid(gearSet) {
   var hasSet = '';
   if(gearSet.length < 15 || gearSet.indexOf(null) > -1) return false;
@@ -90,6 +91,7 @@ var getHeroGear = function getHeroGear(heroData) {
     allHeroSets.push(newGearSet);
   }
 };
+
 function findAverages(data) {
   var m  = data.sort(function(a, b){
       return parseInt(a) - parseInt(b);
@@ -116,9 +118,9 @@ function millisToMinutesAndSeconds(millis) {
 }
 
 var parsePopularGearSets = function parsePopularGearSet() {
-    allHeroSets = allHeroSets.sort(function(a, b){
-      return parseInt(a.heroes.length) - parseInt(b.heroes.length);
-    }).reverse();
+    // allHeroSets = allHeroSets.sort(function(a, b){
+    //   return parseInt(a.heroes.length) - parseInt(b.heroes.length);
+    // }).reverse();
     var setId = 0;
     for(var j = 0; j < allHeroSets.length; j++) {
       var item = allHeroSets[j];
@@ -134,6 +136,9 @@ var parsePopularGearSets = function parsePopularGearSet() {
         return parseInt(a.heroes.length) - parseInt(b.heroes.length);
       }).reverse();
     }
+    allHeroSets = allHeroSets.sort(function(a, b){
+      return parseInt(a.riftLevel.max) - parseInt(b.riftLevel.max);
+    }).reverse();  
     var variantDiff = 1;
     var variantCheckSets = _.cloneDeep(allHeroSets);
     var variantsList = {};
@@ -158,19 +163,27 @@ var parsePopularGearSets = function parsePopularGearSet() {
     var allKeys = _.keys(variantsList);
     for(var i in allHeroSets){
       if(allKeys.indexOf(allHeroSets[i].id.toString()) > -1) {
+        allHeroSets[i].variants = variantsList[allHeroSets[i].id.toString()];
         popularGearSets.push(allHeroSets[i]);
       }
     }
-    //popularGearSets = topSets;
-    //console.log(popularGearSets);
+    console.log(popularGearSets);
 }
 var getSkillSets = function getSkillSets(heroData) {
   //console.log(heroData);
 };
 
 var parseHeroSets = function parseHeroSets() {
+  var heroesArray = [];
   for(var i in allHeroes) {
     var heroData = allHeroes[i];
+    heroesArray.push(heroData);
+  } 
+  heroesArray = heroesArray.sort(function(a, b){
+    return parseInt(a.riftLevel) - parseInt(b.riftLevel);
+  }).reverse();
+  for(var i in heroesArray) {
+    var heroData = heroesArray[i];
     getHeroGear(heroData);
     getSkillSets(heroData);
   }

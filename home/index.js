@@ -3,11 +3,7 @@ define([
   'text!item-data/sets.json',
   'lodash',
   'd3tooltips',
-  './js/item-icon/index.js',
-  './js/item-set/index.js',
-  './js/top-items/index.js',
-  './js/skill-icon/index.js',
-  './js/skill-set/index.js',
+  './js/player-set/index.js',
   'socket-service',
 ],
 function(app, sets, _, test) {
@@ -46,7 +42,6 @@ function(app, sets, _, test) {
           }
           for(var m in popularSet.skills) {
             var skillObj = popularSet.skills[m].skillList;
-            console.log(skillObj);
             for(var p in skillObj.actives) {
               skillObj.actives[p].skill = allSkills[skillObj.actives[p].skill];
             }
@@ -54,40 +49,17 @@ function(app, sets, _, test) {
               skillObj.passives[o] = allSkills[skillObj.passives[o]];
             }
           }
-          for(var j in popularSet.set) {
-            var itemData = allItems[popularSet.set[j]];
-            if(itemData.slots !== void 0){
-              if(itemData.slots.indexOf('left-hand') > -1 ||
-                itemData.slots.indexOf('right-hand') > -1) {
-                  setItems.weapons.push(itemData);
-              } else if(itemData.slots.indexOf('left-finger') > -1 ||
-                itemData.slots.indexOf('right-finger') > -1 ||
-                itemData.slots.indexOf('neck') > -1) {
-                    setItems.jewelery.push(itemData)
-              }
-              else{
-                setItems.armor.push(itemData);
-              }
-            }
-          }
-          for(var k in popularSet.skills[0].list) {
-            var skillData = allSkills[popularSet.skills[0].list[k]];
-            setSkills.push(skillData);
-          }
-          console.log(popularSet);
           // var averageRiftTime = Math.floor(_.sum(popularSet.riftTime)/popularSet.riftTime.length);
           // var averageRiftLevel = Math.floor(_.sum(popularSet.riftLevel)/popularSet.riftLevel.length);
           // _this.popularItems.averageRiftTime = popularSet.riftTime;
           // _this.popularItems.averageRiftTime = popularSet.riftTime;
+          console.log(popularSet);
           var setObj = {
-            skills: setSkills,
-            items: setItems,
             popularGear: popularSet.gearList,
             popularSkills: popularSet.skills
           }
-          _this.popularItems.push(setObj);
+          _this.popularItems.push(popularSet);
         }
-      console.log(_this.popularItems);
       }
       socketService.emit('getInitialData');
       socketService.on('getInitialData',function(data){

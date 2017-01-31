@@ -1,9 +1,6 @@
-<h4 class="text-xs-center">Starter App</h4>
 <div class="container-fluid">
-  <div class="row">
-    <!--{{HomeCtrl.allSets['innas-mantra']}}-->
-  <!--<top-items slots="HomeCtrl.allSets[HomeCtrl.testSet][5].popularItemBuild">-->
-    <div class="col-sm-3">
+  <div class="home-container">
+    <div class="home-divider">
       <div class="thumbnail">
         <div class="thumbnail icon-portrait icon-frame"> 
           <img class="img-responsive img-center" src="js/characters/monk_male.png">
@@ -20,10 +17,9 @@
       </ul>
     </div>
     
-    <div class="col-sm-9">
-      <div ng-repeat="set in HomeCtrl.popularItems track by $index">
-        <item-set items="set.items"></item-set>
-        <skill-set ng-repeat="skills in set.popularSkills" skills="skills.skillList"></skill-set>
+    <div class="home-divider">
+      <div ng-repeat="setData in HomeCtrl.popularItems track by $index">
+        <player-set set-data="setData">
       </div>
     </div>
   </div>
