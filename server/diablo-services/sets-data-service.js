@@ -167,10 +167,111 @@ var parsePopularGearSets = function parsePopularGearSet() {
         popularGearSets.push(allHeroSets[i]);
       }
     }
-    console.log(popularGearSets);
 }
-var getSkillSets = function getSkillSets(heroData) {
+var countSkillRunes = function countSkillRunes() {
+
+}
+var countSkillPassives = function countSkillPassives(popularSetSkills) {
+  var passives = [];
+  var popularPassives = [];
+  for(var i in popularSetSkills) { 
+    var skillList = popularSetSkills[i].skillList;
+    for(var k in skillList.passives) {
+        var passiveSkill = skillList.passives[k];
+        var passiveIndex = passives.indexOf(passiveSkill);
+        if(passiveIndex < 0) {
+          var passiveSkillCount = {
+            name: passiveSkill,
+            count: 0,
+          };
+          passives.push(passiveSkillCount);
+        } else {
+          var passiveSkillCount = passives[passiveIndex];
+        }
+      }
+    //var activesList = _.map(skillList.actives, 'skill');
+  }
+  passives = passives.sort(function(a, b){
+      return parseInt(a.count) - parseInt(b.count);
+    }).reverse(); 
+  passives.splice(4);
+  passives = _.map(passives,'name');
+
+  return passives;
+}
+var countSkillActives = function countSkillActives(popularSetSkills){
+  var spells = [];
+  var popularSpells = [];
+  for(var i in popularSetSkills) { 
+    var skillList = popularSetSkills[i].skillList;
+    for(var k in skillList.actives) {
+        var activeSkill = skillList.actives[k];
+        var skillNames = _.map(spells, 'name');
+        var skillIndex = skillNames.indexOf(activeSkill.skill);
+        if(skillIndex < 0) {
+          var spellNameCount = {
+            name: activeSkill.skill,
+            count: 0,
+            runes: []
+          };
+          spells.push(spellNameCount);
+        } else {
+          var spellNameCount = spells[skillIndex];
+        }
+        var runeIndex = spellNameCount.runes.indexOf(activeSkill.rune);
+        if(runeIndex < 0) {
+          var runeNameCount = {
+            name: activeSkill.rune,
+            count: 0,
+          };
+          spellNameCount.runes.push(runeNameCount);
+        } else {
+          var runeNameCount = spellNameCount.runes[skillIndex];
+        }
+
+        spellNameCount.count++;
+        runeNameCount.count++;
+      }
+    //var activesList = _.map(skillList.actives, 'skill');
+  }
+  spells = spells.sort(function(a, b){
+      return parseInt(a.count) - parseInt(b.count);
+    }).reverse(); 
+  spells.splice(6);
+  for(var i in spells) {
+    var spell = spells[i];
+    spell.runes.splice(1);
+    var popularActive = {
+      skill: spell.name,
+      rune: spell.runes[0].name,
+      count: spell.count
+    }
+    popularSpells.push(popularActive);
+  }
+  return popularSpells;
+}
+var getSkillSets = function getSkillSets() {
   //console.log(heroData);
+  var popularSkills = {};
+  for(var i in popularGearSets) {
+    var popularSet = popularGearSets[i];
+    var popularSetSkills = popularSet.skills;
+    // console.log(popularSetSkills.skillList);
+    // for(var j in popularSetSkills) { 
+    //   var skillList = popularSetSkills[j].skillList;
+    
+    //   //var activesList = _.map(skillList.actives, 'skill');
+    // }
+    // for(var i in )
+    var popularSpellActives = countSkillActives(popularSetSkills);
+    var popularSpellPassives = countSkillPassives(popularSetSkills);
+    popularSet.popularSkills = {
+      actives: popularSpellActives,
+      passives: popularSpellPassives
+    };
+    //console.log(popularSpellActives);
+    //console.log(popularSetSkills);
+  }
 };
 
 var parseHeroSets = function parseHeroSets() {
@@ -185,7 +286,6 @@ var parseHeroSets = function parseHeroSets() {
   for(var i in heroesArray) {
     var heroData = heroesArray[i];
     getHeroGear(heroData);
-    getSkillSets(heroData);
   }
 }
 var bestSets = {};
@@ -217,6 +317,7 @@ var init = function init(){
     allHeroes = heroDataService.getAllHeroes();
     parseHeroSets();
     parsePopularGearSets();
+    getSkillSets();
     groupSets();
     resolve();
   });

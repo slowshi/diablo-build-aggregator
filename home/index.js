@@ -40,24 +40,21 @@ function(app, sets, _, test) {
           for(var k in popularSet.gearList) { 
             popularSet.gearList[k] = allItems[popularSet.gearList[k]];
           }
-          for(var m in popularSet.skills) {
-            var skillObj = popularSet.skills[m].skillList;
-            for(var p in skillObj.actives) {
-              skillObj.actives[p].skill = allSkills[skillObj.actives[p].skill];
-            }
-            for(var o in skillObj.passives) {
-              skillObj.passives[o] = allSkills[skillObj.passives[o]];
-            }
+          for(var p in popularSet.popularSkills.actives) {
+            popularSet.popularSkills.actives[p].skill = allSkills[popularSet.popularSkills.actives[p].skill];
           }
-          // var averageRiftTime = Math.floor(_.sum(popularSet.riftTime)/popularSet.riftTime.length);
-          // var averageRiftLevel = Math.floor(_.sum(popularSet.riftLevel)/popularSet.riftLevel.length);
-          // _this.popularItems.averageRiftTime = popularSet.riftTime;
-          // _this.popularItems.averageRiftTime = popularSet.riftTime;
-          console.log(popularSet);
-          var setObj = {
-            popularGear: popularSet.gearList,
-            popularSkills: popularSet.skills
+          for(var o in popularSet.popularSkills.passives) {
+            popularSet.popularSkills.passives[o] = allSkills[popularSet.popularSkills.passives[o]];
           }
+          // for(var m in popularSet.skills) {
+          //   var skillObj = popularSet.skills[m].skillList;
+          //   for(var p in skillObj.actives) {
+          //     skillObj.actives[p].skill = allSkills[skillObj.actives[p].skill];
+          //   }
+          //   for(var o in skillObj.passives) {
+          //     skillObj.passives[o] = allSkills[skillObj.passives[o]];
+          //   }
+          // }
           _this.popularItems.push(popularSet);
         }
       }

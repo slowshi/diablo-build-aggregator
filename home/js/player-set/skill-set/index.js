@@ -24,6 +24,6 @@ function(app, html, css) {
 
   app.registerController('SkillSetController', ['$scope', 'cssInjector',
     function($scope, cssInjector) {
-      this.skills = this.skillData.skillList;
+      this.skills = this.skillData;
     }]);
 });

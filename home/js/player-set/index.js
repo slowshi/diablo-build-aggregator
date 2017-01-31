@@ -26,7 +26,8 @@ function(app, html, css) {
   app.registerController('PlayerSetController', ['$scope', 'cssInjector', 'playerSetVMService',
     function($scope, cssInjector, playerSetVMService) {
       console.log(this.setData);
-      this.skills = this.setData.skills[0];
+      this.skills = this.setData.popularSkills;
+      console.log(this.skills)
       this.items = this.setData.gearList;
       this.legendarySet = [['legendary0', 'legendary1','legendary2']];
     }]);
