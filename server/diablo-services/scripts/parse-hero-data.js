@@ -18,11 +18,11 @@ var init = function init(_refresh) {
           apiService.getHeroData(hero, refresh)
           .then(heroDataService.parseHero));
       }
+      console.log(heroArray.length);
       Promise.all(heroArray).then(function(res){
         console.log("Done getting users!")
         var allItems = heroDataService.getAllItemIds();
         var allSkills = heroDataService.getAllSkills();
-        console.log("YES");
         return crudService._save('js/item-data/itemids.json', allItems)
         .then(function(){
           return crudService._save('js/player-data/skills.json', allSkills)
