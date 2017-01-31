@@ -151,7 +151,7 @@ var parsePopularGearSets = function parsePopularGearSet() {
         if(gearSet.id === variantCheckSet.id) continue;
         if(blacklistedVariants.indexOf(variantCheckSet.id) > -1)continue;
         var variantItems = getSetDifference(gearSet.set, variantCheckSet.set);
-        if(variantItems.length < 6){
+        if(variantItems.length < 3){
           if(typeof variantsList[gearSet.id] === 'undefined') {
             variantsList[gearSet.id] = [];
           }

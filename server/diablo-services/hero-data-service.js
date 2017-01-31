@@ -152,19 +152,20 @@ var parseGearIds = function parseGearIds(heroData) {
   }
   return gearSet;
 }
-var heroCount = 0;
 var parseHero = function parseHero(data) {
   return new Promise(function (resolve, reject) {
-    heroCount++;
-    parseAllItemIds(data);
-    var skillsList = parseAllSkillIds(data);
-    data.playerSkills = skillsList.playerSkills;
-    data.skillList = skillsList.skills;
-    var heroGear = parseGearIds(data);
-    data.gearList = heroGear;
-    allHeroes[data.id] = data;
-    resolve();
-    console.log("RESOLVED",heroCount);
+    if (data.class !== void 0) {
+      parseAllItemIds(data);
+      var skillsList = parseAllSkillIds(data);
+      data.playerSkills = skillsList.playerSkills;
+      data.skillList = skillsList.skills;
+      var heroGear = parseGearIds(data);
+      data.gearList = heroGear;
+      allHeroes[data.id] = data;
+      resolve(0);
+    } else {
+      resolve(data);
+    }
   });
 }
 

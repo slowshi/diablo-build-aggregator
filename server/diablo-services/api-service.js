@@ -6,6 +6,7 @@ var crudService = require('./crud-service.js');
 var apiTransform = require('./api-transform.js');
 var modelHelper = require('../model-helper.js');
 var apiModelService = require('./api-model-service.js');
+var _ = require('lodash');
 
 var makeEndpointUrl = function makeEndpointUrl(_endpoint, _useApiKey) {
   var endpoint = _endpoint;
@@ -78,6 +79,9 @@ var loadHeroDataFromEndpoint = function loadHeroDataFromEndpoint(heroData) {
         remodeledData.riftLevel = riftData.riftLevel;
         remodeledData.riftTime = riftData.riftTime;
       }
+      if(remodeledData.id === void 0) {
+        remodeledData.id = heroData.player.heroId;
+      }
       return  crudService._save(heroJsonPath, remodeledData);
     });
 }
@@ -121,11 +125,24 @@ var getItemData = function getItemData(itemId) {
     return loadItemDataFromEndpoint(itemId);
   }
 };
-
+var omitInvalidHeroes = function omitInvalidHeroes(invalidHeroes) {
+  var heroIds = _.map(invalidHeroes, 'id');
+  loadLadderDataFromJson()
+  .then(function(data) {
+    var i = data.row.length;
+    while(i--) {
+      if(heroIds.indexOf(data.row[i].player.heroId) > -1){
+        data.row.splice(i,1)
+      }
+    }
+    return crudService._save('js/player-data/ladder.json', data);
+  })
+}
 module.exports = {
   makeEndpointUrl: makeEndpointUrl,
   setAccessToken: setAccessToken,
   getLadderData: getLadderData,
   getHeroData: getHeroData,
-  getItemData: getItemData
+  getItemData: getItemData,
+  omitInvalidHeroes: omitInvalidHeroes
 };

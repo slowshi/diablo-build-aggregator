@@ -4,7 +4,7 @@ var accessToken = '';
 var heroDataService = require('../hero-data-service.js');
 var crudService = require('../crud-service.js');
 var apiService = require('../api-service.js');
-
+var without = require('lodash.without');
 var init = function init(_refresh) {
   var refresh = _refresh || false;
   return new Promise(function (resolve, reject) {
@@ -20,6 +20,9 @@ var init = function init(_refresh) {
       }
       console.log(heroArray.length);
       Promise.all(heroArray).then(function(res){
+        var invalidHeroes = without(res, 0);
+        console.log(invalidHeroes);
+        apiService.omitInvalidHeroes(invalidHeroes);
         console.log("Done getting users!")
         var allItems = heroDataService.getAllItemIds();
         var allSkills = heroDataService.getAllSkills();
