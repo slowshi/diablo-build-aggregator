@@ -1,0 +1,22 @@
+<div class="player-card">
+  <item-set item-data="PlayerSetCtrl.items"></item-set>
+  <div class="right-column">
+    <skill-set skill-data="PlayerSetCtrl.skills"></skill-set>
+    <item-set class="right-column-set" 
+              item-data="PlayerSetCtrl.items"
+              rows="PlayerSetCtrl.legendarySet">
+    </item-set>
+  </div>
+  <table class="table-sm table-bordered table-inverse">
+    <thead>
+      <tr>
+        <th ng-repeat="(key,val) in PlayerSetCtrl.setData.riftLevel">{{key}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td ng-repeat="(key, val) in PlayerSetCtrl.setData.riftLevel">{{val}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

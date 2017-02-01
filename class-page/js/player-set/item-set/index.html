@@ -1,0 +1,8 @@
+<div class="set-container" ng-repeat="row in ItemSetCtrl.rows track by $index">
+  <item-icon
+          ng-repeat="slot in row track by $index"
+          ng-if="ItemSetCtrl.itemData[slot]"
+          class="item-icon"
+          item-data="ItemSetCtrl.itemData[slot]"
+          size="small"></item-icon>
+</div>

@@ -1,0 +1,9 @@
+item-set .set-container {
+  display: flex;
+  width:200px;
+  justify-content: center;
+}
+item-set .item-icon {
+  margin:5px;
+  justify-content: center;
+}

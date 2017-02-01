@@ -28,7 +28,6 @@ module.exports = {
     res.end(contents);
   },
   get404: function(res) {
-    res.writeHead(302, {Location: './'});
-    res.end();
+    module.exports.validatePage(res,'./index.html');
   }
 };

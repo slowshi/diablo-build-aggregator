@@ -1,9 +1,14 @@
 define([], function() {
   var states = {
     'home': {
-      url: 'home/{setId}',
+      url: '/',
       path: 'home',
       controller: 'HomeController as HomeCtrl'
+    },
+    'class': {
+      url: '/class/{className}/{setId}',
+      path: 'class-page',
+      controller: 'ClassPageController as ClassPageCtrl'
     }
   };
   return states;

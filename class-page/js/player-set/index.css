@@ -1,0 +1,16 @@
+player-set .player-card {
+  display: flex;
+  padding:20px;
+  margin-bottom: 15px;
+  background: #12110f;
+  border: 1px solid #28241d;
+}
+player-set .right-column {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+}
+player-set .right-column-set {
+  display: flex;
+  justify-content: center;
+}

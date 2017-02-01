@@ -1,0 +1,30 @@
+<div class="container-fluid">
+  <app-header></app-header>
+  <div class="class-page-container">
+    <div class="class-page-divider">
+      <div class="thumbnail">
+        <div class="thumbnail icon-portrait icon-frame"> 
+          <img class="img-responsive img-center" src="{{ClassPageCtrl.currentClassImage}}" style="
+    width: 224px;
+    height: 242px;
+">
+        </div>
+      </div>
+      <div xmlns="http://www.w3.org/1999/xhtml" class="section-header has-icon">
+        <h3 class="header-3">sets</h3>
+        <span class="icon sword"></span>
+      </div>
+      <ul>
+        <li ng-repeat="set in ClassPageCtrl.allSets">
+          <a href="#" ng-click="ClassPageCtrl.selectSet(set.slug)">{{set.name}}</a>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="class-page-divider">
+      <div ng-repeat="setData in ClassPageCtrl.popularItems track by $index">
+        <player-set set-data="setData">
+      </div>
+    </div>
+  </div>
+</div>

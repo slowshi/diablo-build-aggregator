@@ -3,14 +3,13 @@ define(['app', 'states'], function(app, states) {
     var stateProvider;
     var couchPotatoProvider;
     app.config(['$stateProvider', '$couchPotatoProvider',
-      '$sceDelegateProvider', '$locationProvider',
+      '$sceDelegateProvider', '$locationProvider', '$urlRouterProvider',
       function($stateProvider, $couchPotatoProvider,
-		$sceDelegateProvider, $locationProvider) {
+		$sceDelegateProvider, $locationProvider, $urlRouterProvider) {
         stateProvider = $stateProvider;
         couchPotatoProvider = $couchPotatoProvider;
         $locationProvider.html5Mode({
           enabled: true,
-          requireBase: false
         });
         $sceDelegateProvider.resourceUrlWhitelist([
 				// Allow same origin resource loads.
@@ -19,6 +18,8 @@ define(['app', 'states'], function(app, states) {
 				// Notice the difference between * and **.
           'https://www.youtube.com/**'
         ]);
+        $urlRouterProvider.when('', 'root');
+
       }]);
 
     app.run(['$couchPotato', '$state', '$stateParams', '$rootScope',
@@ -26,43 +27,74 @@ define(['app', 'states'], function(app, states) {
         app.lazy = $couchPotato;
         $rootScope.$state = $state;
         $rootScope.$stateParams = $stateParams;
-        stateProvider.state('home', {
-          url:'/{setId}',
-          templateUrl: 'home/index.html',
-          resolve: {
-            deps: couchPotatoProvider
-          .resolveDependencies(['home/index.js'])
-          },
-          controller: 'HomeController as HomeCtrl'
-        });
+        // stateProvider.state('header', {
+        //   templateUrl: 'header/index.html',
+        //   resolve: {
+        //     deps: couchPotatoProvider
+        //   .resolveDependencies(['header/index.js'])
+        //   },
+        //   controller: 'HeaderController as HeaderCtrl'
+        // });
         // $state.go('home');
-        // stateProvider.state('root', {
-        //   url: '',
+        // stateProvider.state('header', {
         //   views: {
-        //     'main@': {
-        //       templateUrl: '/home/index.html',
+        //     'header': {
+        //       templateUrl: '/header/index.html',
         //       resolve: {
         //         deps: couchPotatoProvider.
-        //         resolveDependencies(['/home/index.js']),
+        //         resolveDependencies(['/header/index.js']),
         //       },
-        //         controller: 'HomeController as HomeCtrl',
+        //         controller: 'HeaderController as HeaderCtrl',
         //     },
         //   },
         // });
-
-        // for(var key in states) {
-        //   var state = states[key];
-        //   stateProvider.state(key, {
-        //     url: state.url,
-        //     templateUrl: '/' + state.path + '/index.html',
-        //     resolve:{
-        //       deps: couchPotatoProvider
-        //       .resolveDependencies(['/'+ state.path + '/index.js']),
-        //     },
-        //     controller: state.controller,
-        //   });
+        stateProvider.state('root', {
+          abstract: true,
+          views: {
+            'header@':{
+              templateUrl: 'header/index.html',
+              controller: "HeaderController as HeaderCtrl",
+              resolve: {
+                loadStateCtrl: couchPotatoProvider
+                .resolveDependencies('header/index.js')
+              }
+            }
+          }
+        });
+        // for (var key in states) {
+        //   if (states.hasOwnProperty(key)) {
+        //     var state = states[key];
+        //     var dependencies = [state.path + '/index.js'];
+        //     stateProvider.state(key, {
+        //       parent: 'root',
+        //       url: state.url,
+        //       path: state.path,
+        //       views: {
+        //         'main@': {
+        //           templateUrl: state.path + '/index.html',
+        //           controller: state.controller,
+        //           resolve: {
+        //             loadStateCtrl: couchPotatoProvider
+        //             .resolveDependencies(dependencies)
+        //           }
+        //         }
+        //       }
+        //     });
+        //   }
         // }
-        $state.go('home');
+        for(var key in states) {
+          var state = states[key];
+          stateProvider.state(key, {
+            url: state.url,
+            templateUrl: state.path + '/index.html',
+            resolve:{
+              deps: couchPotatoProvider
+              .resolveDependencies([state.path + '/index.js']),
+            },
+            controller: state.controller,
+          });
+        }
+        console.log($state.current)
       }]);
     var bootstrapApplication = (function() {
       angular.element(document)

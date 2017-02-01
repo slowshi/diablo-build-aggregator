@@ -1,0 +1,13 @@
+<div class="skill-list">
+  <skill-icon 
+    class="skill-icon"
+    ng-repeat="skillSet in SkillSetCtrl.skills.actives track by $index"
+    skill-data="skillSet">
+  </skill-icon>
+</div>
+<div class="passive-list">
+  <passive-icon
+    class="passive-icon"
+    ng-repeat="passiveSet in SkillSetCtrl.skills.passives track by $index"
+    passive-data="passiveSet"></passive-icon>
+</div>

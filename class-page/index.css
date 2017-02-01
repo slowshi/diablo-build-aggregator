@@ -1,0 +1,7 @@
+.class-page-container {
+  display:flex;
+  flex-flow: row wrap;
+}
+.class-page-divider {
+  margin: 20px;
+}
