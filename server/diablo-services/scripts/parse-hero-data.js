@@ -18,10 +18,8 @@ var init = function init(_refresh) {
           apiService.getHeroData(hero, refresh)
           .then(heroDataService.parseHero));
       }
-      console.log(heroArray.length);
       Promise.all(heroArray).then(function(res){
         var invalidHeroes = without(res, 0);
-        console.log(invalidHeroes);
         apiService.omitInvalidHeroes(invalidHeroes);
         console.log("Done getting users!")
         var allItems = heroDataService.getAllItemIds();

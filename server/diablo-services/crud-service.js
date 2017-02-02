@@ -5,7 +5,7 @@ var throttledRequest = require('throttled-request')(request);
 throttledRequest.configure({
   requests: 1,
   milliseconds: function() {
-    var minSeconds = 11, maxSeconds = 15;
+    var minSeconds = 13, maxSeconds = 17;
     return Math.floor((Math.random() * (maxSeconds - minSeconds) + minSeconds));
   }
 });

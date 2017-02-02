@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var Promise = require('promise');
-var itemDataService = require('./item-data-service.js');
+var dataStore = require('./data-store.js');
 var allHeroes = {};
 var allItemIds = [];
 var allItems = [];
@@ -28,63 +28,25 @@ var getJsonPathFromId = function getJsonPathFromId(id) {
   return jsonPath;
 };
 
-var parseAllItemIds = function parseAllItemIds(data) {
-  for (var i in data.items) {
-    var item = data.items[i];
+var parseAllItemIds = function parseAllItemIds(heroData) {
+  for (var i in heroData.items) {
+    var item = heroData.items[i];
     if(item.id == null) continue;
+    dataStore.updateItemData(item.id);
     if(allItemIds.indexOf(item.id) == -1) {
       allItemIds.push(item.id);
     }
-    var hasItem = false;
-    for(var k in popularItems) {
-      if(popularItems[k].id === item.id) {
-        hasItem = true;
-        popularItems[k].count++;
-      }
-    }
-    if(!hasItem) {
-      var newPopularItem = {
-        id: item.id,
-        count: 1,
-        rank: 0
-      };
-      popularItems.push(newPopularItem)
-    }
   }
-  if(data.legendaryPowers !== void 0) {
-    for (var j in data.legendaryPowers) {
-      var legendaryItem = data.legendaryPowers[j];
+  if(heroData.legendaryPowers !== void 0) {
+    for (var j in heroData.legendaryPowers) {
+      var legendaryItem = heroData.legendaryPowers[j];
       if(legendaryItem == null) continue;
+      dataStore.updateItemData(item.id);
       if(allItemIds.indexOf(legendaryItem) == -1) {
         allItemIds.push(legendaryItem);
       }
-      var hasItem = false;
-      for(var l in popularItems) {
-        if(popularItems[l].id === legendaryItem) {
-          hasItem = true;
-          popularItems[l].count++;
-        }
-      }
-      if(!hasItem) {
-        var newPopularItem = {
-          id: legendaryItem,
-          count: 1,
-          rank: 0
-        };
-        popularItems.push(newPopularItem)
-      }
     }
   }
-  
-  // for(var k in data.followers) {
-  //   var follower = data.followers[k];
-  //   for(var p in follower.items) {
-  //     var followerItem = follower.items[p];
-  //     if(allItemIds.indexOf(followerItem.id) == -1) {
-  //       allItemIds.push(followerItem.id);
-  //     }
-  //   }
-  // }
 };
 var parseAllSkillIds = function parseAllSkillIds(data) {
   var actives = data.skills.active;
@@ -152,6 +114,16 @@ var parseGearIds = function parseGearIds(heroData) {
   }
   return gearSet;
 }
+var validateFullSet = function validateFullSet(heroData) {
+  var fullSet = true;
+  var gearListCount = _.values(heroData.gearList).length;
+  var skillListCount = heroData.skillList.length;
+  if (gearListCount < 15 || skillListCount < 16) {
+    fullSet = false;
+  }
+
+  return fullSet;
+}
 var parseHero = function parseHero(data) {
   return new Promise(function (resolve, reject) {
     if (data.class !== void 0) {
@@ -161,8 +133,12 @@ var parseHero = function parseHero(data) {
       data.skillList = skillsList.skills;
       var heroGear = parseGearIds(data);
       data.gearList = heroGear;
-      allHeroes[data.id] = data;
-      resolve(0);
+      if(!validateFullSet(data)){
+        resolve(data);      
+      }else{
+        allHeroes[data.id] = data;
+        resolve(0);
+      }
     } else {
       resolve(data);
     }
@@ -178,7 +154,7 @@ var getAllHeroes = function getAllHeroes() {
 }
 
 var getAllItemIds = function getAllItemIds() {
-  return _.cloneDeep(allItemIds);
+  return _.cloneDeep(dataStore.getDataStore('allItemIds'));
 }
 var getPopularItems = function getPopularItems() {
   return _.cloneDeep(popularItems);

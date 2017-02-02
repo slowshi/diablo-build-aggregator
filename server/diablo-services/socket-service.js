@@ -9,7 +9,6 @@ var setSocket = function setSocket(connectedIo) {
   return new Promise(function (resolve, reject) {
     io = connectedIo;
     io.sockets.on('connection',function(socket){
-      console.log('expose endpoints to socket');
       socket.on('getInitialData', getInitialData)
       socket.on('getHeroData',getHeroData);
       socket.on('getHeroSets',getHeroSets);
