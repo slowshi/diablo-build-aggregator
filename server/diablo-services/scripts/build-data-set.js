@@ -20,10 +20,9 @@ var init = function init(_className, _refresh) {
           apiService.getHeroData(hero, refresh)
           .then(heroDataService.parseHero));
       }
-      Promise.all(heroArray).then(function(res){
-        var invalidHeroes = _.without(res, 0);
-        apiService.omitInvalidHeroes(className, invalidHeroes);
+      return Promise.all(heroArray).then(function(res){
         console.log("Done getting users!")
+        var invalidHeroes = _.without(res, 0);
         var allItems = heroDataService.getAllItemIds();
         var allSkills = heroDataService.getAllSkills();
         var heroItems = [];
@@ -33,12 +32,22 @@ var init = function init(_className, _refresh) {
             apiService.getItemData(item)
             .then(itemDataService.parseItems));
         }
+        var saveItemIds = function() {
+          return crudService._save('js/item-data/itemids.json', allItems)
+        }
+        var saveSkillIds = function() {
+          return crudService._save('js/player-data/skills.json', allSkills)
+        }
+        var omitInvalidHeroes = function() {
+          return apiService.omitInvalidHeroes(className, invalidHeroes)
+        }
         return Promise.all(heroItems).then(function(res){
           console.log('Done getting items!');
           var allSets = itemDataService.getAllSets();
           return crudService._save('js/item-data/sets.json', allSets)
-          .then(crudService._save('js/item-data/itemids.json', allItems))
-          .then(crudService._save('js/player-data/skills.json', allSkills))
+          .then(saveItemIds)
+          .then(saveSkillIds)
+          .then(omitInvalidHeroes)
           .then(setsDataService.init)
           .then(function(){
             resolve();

@@ -127,7 +127,7 @@ var getItemData = function getItemData(itemId) {
 };
 var omitInvalidHeroes = function omitInvalidHeroes(className, invalidHeroes) {
   var heroIds = _.map(invalidHeroes, 'id');
-  loadLadderDataFromJson(className)
+  return loadLadderDataFromJson(className)
   .then(function(data) {
     var i = data.row.length;
     while(i--) {
@@ -135,7 +135,7 @@ var omitInvalidHeroes = function omitInvalidHeroes(className, invalidHeroes) {
         data.row.splice(i,1)
       }
     }
-    return crudService._save('js/player-data/ladder.json', data);
+    return crudService._save('js/player-data/' + className +'/ladder.json', data);
   })
 }
 module.exports = {
