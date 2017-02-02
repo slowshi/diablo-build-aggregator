@@ -41,7 +41,7 @@ var parseAllItemIds = function parseAllItemIds(heroData) {
     for (var j in heroData.legendaryPowers) {
       var legendaryItem = heroData.legendaryPowers[j];
       if(legendaryItem == null) continue;
-      dataStore.updateItemData(item.id);
+      dataStore.updateItemData(legendaryItem);
       if(allItemIds.indexOf(legendaryItem) == -1) {
         allItemIds.push(legendaryItem);
       }

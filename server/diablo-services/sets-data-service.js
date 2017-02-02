@@ -42,14 +42,8 @@ var getHeroGear = function getHeroGear(heroData) {
     gearSet = gearSet.concat(heroData.legendaryPowers)
   }
   var hasSetSlug = checkGearValid(gearSet);
-  if(heroData.skillList.length < 16)return;
   var hasSet = false;
   var skillList = [];
-  if(typeof heroData.skills === 'undefined'){
-    brokenData++; 
-    console.log('brokenData',brokenData);
-   return;
-  }
   for(var j in allHeroSets) {
     var setCheck = allHeroSets[j];
     if(getSetDifference(setCheck.set, gearSet).length == 0){
@@ -118,9 +112,6 @@ function millisToMinutesAndSeconds(millis) {
 }
 
 var parsePopularGearSets = function parsePopularGearSet() {
-    // allHeroSets = allHeroSets.sort(function(a, b){
-    //   return parseInt(a.heroes.length) - parseInt(b.heroes.length);
-    // }).reverse();
     var setId = 0;
     for(var j = 0; j < allHeroSets.length; j++) {
       var item = allHeroSets[j];
@@ -131,14 +122,9 @@ var parsePopularGearSets = function parsePopularGearSet() {
         item.riftTime[i] = millisToMinutesAndSeconds(item.riftTime[i]);
       }
       setId++;
-
-      item.skills = item.skills.sort(function(a, b){
-        return parseInt(a.heroes.length) - parseInt(b.heroes.length);
-      }).reverse();
+      item.skills = _.sortBy(item.skills,['heroes.length']).reverse();
     }
-    allHeroSets = allHeroSets.sort(function(a, b){
-      return parseInt(a.riftLevel.max) - parseInt(b.riftLevel.max);
-    }).reverse();  
+    allHeroSets = _.sortBy(allHeroSets,['riftLevel.max', 'heroes.length']).reverse();
     var variantDiff = 1;
     var variantCheckSets = _.cloneDeep(allHeroSets);
     var variantsList = {};
@@ -189,11 +175,8 @@ var countSkillPassives = function countSkillPassives(popularSetSkills) {
           var passiveSkillCount = passives[passiveIndex];
         }
       }
-    //var activesList = _.map(skillList.actives, 'skill');
   }
-  passives = passives.sort(function(a, b){
-      return parseInt(a.count) - parseInt(b.count);
-    }).reverse(); 
+  passives = _.sortBy(passives,['count']).reverse();
   passives.splice(4);
   passives = _.map(passives,'name');
 
@@ -202,8 +185,23 @@ var countSkillPassives = function countSkillPassives(popularSetSkills) {
 var countSkillActives = function countSkillActives(popularSetSkills){
   var spells = [];
   var popularSpells = [];
+  var completeActivesList = [];
   for(var i in popularSetSkills) { 
     var skillList = popularSetSkills[i].skillList;
+    var activeList = _.map(skillList.actives, 'skill');
+    var hasActiveList = false
+    for(var w in completeActivesList) {
+      if(getSetDifference(activeList, completeActivesList[w].activeList).length === 0) {
+        hasActiveList = true
+        completeActivesList[w].count++;
+      }
+    }
+    if(!hasActiveList){
+      completeActivesList.push({
+        activeList: activeList,
+        count: 1
+      })
+    }
     for(var k in skillList.actives) {
         var activeSkill = skillList.actives[k];
         var skillNames = _.map(spells, 'name');
@@ -232,45 +230,38 @@ var countSkillActives = function countSkillActives(popularSetSkills){
         spellNameCount.count++;
         runeNameCount.count++;
       }
-    //var activesList = _.map(skillList.actives, 'skill');
   }
-  spells = spells.sort(function(a, b){
-      return parseInt(a.count) - parseInt(b.count);
-    }).reverse(); 
-  spells.splice(6);
-  for(var i in spells) {
-    var spell = spells[i];
-    spell.runes.splice(1);
-    var popularActive = {
-      skill: spell.name,
-      rune: spell.runes[0].name,
-      count: spell.count
+  var popularSpells = [];
+  completeActivesList = _.sortBy(completeActivesList,['count']).reverse();
+  for(var i in completeActivesList[0].activeList){
+    var spellName = completeActivesList[0].activeList[i];
+    for(var j in spells){
+      var spell = spells[j];
+      if(spellName === spell.name){
+        spell.runes = _.sortBy(spell.runes,['count']).reverse();
+        var popularActive = {
+          skill: spell.name,
+          rune: spell.runes[0].name,
+          count: spell.count
+        }
+        popularSpells.push(popularActive);
+      }
     }
-    popularSpells.push(popularActive);
   }
+
   return popularSpells;
 }
 var getSkillSets = function getSkillSets() {
-  //console.log(heroData);
   var popularSkills = {};
   for(var i in popularGearSets) {
     var popularSet = popularGearSets[i];
     var popularSetSkills = popularSet.skills;
-    // console.log(popularSetSkills.skillList);
-    // for(var j in popularSetSkills) { 
-    //   var skillList = popularSetSkills[j].skillList;
-    
-    //   //var activesList = _.map(skillList.actives, 'skill');
-    // }
-    // for(var i in )
     var popularSpellActives = countSkillActives(popularSetSkills);
     var popularSpellPassives = countSkillPassives(popularSetSkills);
     popularSet.popularSkills = {
       actives: popularSpellActives,
       passives: popularSpellPassives
     };
-    //console.log(popularSpellActives);
-    //console.log(popularSetSkills);
   }
 };
 
@@ -280,9 +271,8 @@ var parseHeroSets = function parseHeroSets() {
     var heroData = allHeroes[i];
     heroesArray.push(heroData);
   } 
-  heroesArray = heroesArray.sort(function(a, b){
-    return parseInt(a.riftLevel) - parseInt(b.riftLevel);
-  }).reverse();
+  heroesArray = _.sortBy(heroesArray,['riftLevel']).reverse();
+
   for(var i in heroesArray) {
     var heroData = heroesArray[i];
     getHeroGear(heroData);

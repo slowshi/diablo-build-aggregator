@@ -40,28 +40,28 @@ var setAccessToken = function setAccessToken(token) {
 };
 
 
-var loadLadderDataFromJson = function loadLadderDataFromJson() {
-  return crudService._load('js/player-data/ladder.json');
+var loadLadderDataFromJson = function loadLadderDataFromJson(_className) {
+  return crudService._load('js/player-data/'+_className+'/ladder.json');
 };
 
-var loadLadderDataFromEndpoint = function loadLadderDataFromEndpoint() {
+var loadLadderDataFromEndpoint = function loadLadderDataFromEndpoint(_className) {
   var endpoint =  makeEndpointUrl(
-    'https://us.api.battle.net/data/d3/season/9/leaderboard/rift-monk?namespace=2-1-US');
+    'https://us.api.battle.net/data/d3/season/9/leaderboard/'+_className+'?namespace=2-1-US');
     return crudService._get(endpoint)
     .then(function(data){
       var flatData = apiModelService.parseLadderData(data);
       var formatter = modelHelper.getFormatter(apiTransform.getLadder);
       var formatted = formatter(flatData);
-      return crudService._save('js/player-data/ladder.json', formatted);
+      return crudService._save('js/player-data/'+_className+'ladder.json', formatted);
     });
 };
 
-var getLadderData = function getLadderData(_refresh) {
+var getLadderData = function getLadderData(_className, _refresh) {
   var refresh = _refresh || false;
   if(refresh) {
-    return loadLadderDataFromEndpoint();
+    return loadLadderDataFromEndpoint(_className);
   } else { 
-    return loadLadderDataFromJson();
+    return loadLadderDataFromJson(_className);
   }
 };
 
@@ -125,9 +125,9 @@ var getItemData = function getItemData(itemId) {
     return loadItemDataFromEndpoint(itemId);
   }
 };
-var omitInvalidHeroes = function omitInvalidHeroes(invalidHeroes) {
+var omitInvalidHeroes = function omitInvalidHeroes(className, invalidHeroes) {
   var heroIds = _.map(invalidHeroes, 'id');
-  loadLadderDataFromJson()
+  loadLadderDataFromJson(className)
   .then(function(data) {
     var i = data.row.length;
     while(i--) {
