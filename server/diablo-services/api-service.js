@@ -7,9 +7,7 @@ var apiTransform = require('./api-transform.js');
 var modelHelper = require('../model-helper.js');
 var apiModelService = require('./api-model-service.js');
 var _ = require('lodash');
-var regions = [
-  'us','eu', 'kr'
-];
+
 var makeEndpointUrl = function makeEndpointUrl(_endpoint, _useApiKey) {
   var endpoint = _endpoint;
   var useApiKey = _useApiKey || false;
@@ -77,10 +75,9 @@ var getLadderData = function getLadderData(_className, _region, _refresh) {
   var dir = 'js/player-data/'+_className;
   if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
-    for(var i in regions) {
-      var region = regions[i];
-      fs.mkdirSync(dir + '/' + region)
-    }
+  }
+  if (!fs.existsSync(dir + '/' + region)){
+    fs.mkdirSync(dir + '/' + region)
   }
   if(refresh) {
     return loadLadderDataFromEndpoint(_className, region);

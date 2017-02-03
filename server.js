@@ -11,7 +11,7 @@ var buildDataSet = require('./server/diablo-services/scripts/build-data-set.js')
 
 apiService.setAccessToken(accessToken)
 .then(function(){
-  buildDataSet.init()
+  buildDataSet.init('rift-crusader', 'us')
   .then(function(){
     startup.initialize(serverUrl)
     .then(function(io){

@@ -9,7 +9,7 @@ var _ = require('lodash');
 
 var init = function init(_className, _region, _refresh) {
   var refresh = _refresh || false;
-  var region = _region || 'eu';
+  var region = _region || 'us';
   var className = _className || 'rift-monk';
   return new Promise(function (resolve, reject) {
     apiService.getLadderData(className, region, refresh).
@@ -21,6 +21,7 @@ var init = function init(_className, _region, _refresh) {
           apiService.getHeroData(hero, className, refresh)
           .then(heroDataService.parseHero));
       }
+      console.log("FINiSHED?");
       return Promise.all(heroArray).then(function(res){
         console.log("Done getting users!")
         var invalidHeroes = _.without(res, 0);

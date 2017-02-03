@@ -84,13 +84,15 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
   if(typeof passives !== 'undefined') {
     for(var j in passives) {
       var passive = passives[j];
-      skillObj.skills.push(passive.skill.slug);
-      skillObj.playerSkills.passives.push(passive.skill.slug);
-      if(typeof allSkills[passive.skill.slug] == 'undefined'){
-        passive.skill.type = 'passive';   
-        allSkills[passive.skill.slug] = passive.skill;
-        allSkills[passive.skill.slug].quickTip = 
-          'class/'+ data.class +'/passive/' + passive.skill.slug;
+      if(typeof passive.skill !== 'undefined'){
+        skillObj.skills.push(passive.skill.slug);
+        skillObj.playerSkills.passives.push(passive.skill.slug);
+        if(typeof allSkills[passive.skill.slug] == 'undefined'){
+          passive.skill.type = 'passive';   
+          allSkills[passive.skill.slug] = passive.skill;
+          allSkills[passive.skill.slug].quickTip = 
+            'class/'+ data.class +'/passive/' + passive.skill.slug;
+        }
       }
     }
   }

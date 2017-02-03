@@ -16,7 +16,8 @@ function(app, sets, _, test) {
       var _this = this;
       var popularGearSets;
       var allItems;
-      var allSkills
+      var allSkills;
+      _this.allSets = [];
       _this.popularItems = [];
       _this.currentSet = $stateParams.setId || 'raiment-of-a-thousand-storms';      
       _this.currentClass = $stateParams.className || 'monk';
@@ -67,13 +68,23 @@ function(app, sets, _, test) {
           storeService.updateStoreData(i,data[i]);
         }
         popularGearSets = storeService.getStoreData('popularGearSets');
+       // console.log('POPULAR', popularGearSets);
+//_this.allSets = _.keys(popularGearSets);
         allItems = storeService.getStoreData('allItems');
         allSkills = storeService.getStoreData('allSkills');
+        var parsedSets = JSON.parse(sets);
+        for(var i in parsedSets) {
+          var set = parsedSets[i];
+          console.log('wht', set,popularGearSets[set.slug])
+          if(popularGearSets[set.slug] !== void 0) {
+            _this.allSets.push(set);
+          }
+        }
         _this.updateGearSets();
       })
 
       _this.updateGearSets();
-      this.allSets = JSON.parse(sets);
+      console.log('allSets',_this.allSets);
       socketService.on('connect', function(){
       });
       socketService.on('disconnect', function(){
