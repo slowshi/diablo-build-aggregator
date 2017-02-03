@@ -17,7 +17,7 @@ var init = function init(_className, _refresh) {
       for(var i =0; i < data.row.length; i++) {
         var hero = data.row[i];
         heroArray.push(
-          apiService.getHeroData(hero, refresh)
+          apiService.getHeroData(hero, className, refresh)
           .then(heroDataService.parseHero));
       }
       return Promise.all(heroArray).then(function(res){
@@ -32,19 +32,21 @@ var init = function init(_className, _refresh) {
             apiService.getItemData(item)
             .then(itemDataService.parseItems));
         }
-        var saveItemIds = function() {
-          return crudService._save('js/item-data/itemids.json', allItems)
+        var saveSets = function saveSets() {
+          var allSets = itemDataService.getAllSets();
+          return apiService.updateItemSetTypes(allSets);
         }
-        var saveSkillIds = function() {
-          return crudService._save('js/player-data/skills.json', allSkills)
+        var saveItemIds = function saveItemIds() {
+          return apiService.updateAllItemIds(allItems);
         }
-        var omitInvalidHeroes = function() {
+        var saveSkillIds = function saveSkillIds() {
+          return apiService.updateHeroSkills(className, allSkills);
+        }
+        var omitInvalidHeroes = function omitInvalidHeroes() {
           return apiService.omitInvalidHeroes(className, invalidHeroes)
         }
-        return Promise.all(heroItems).then(function(res){
-          console.log('Done getting items!');
-          var allSets = itemDataService.getAllSets();
-          return crudService._save('js/item-data/sets.json', allSets)
+        return Promise.all(heroItems)
+          .then(saveSets)
           .then(saveItemIds)
           .then(saveSkillIds)
           .then(omitInvalidHeroes)
@@ -52,15 +54,12 @@ var init = function init(_className, _refresh) {
           .then(function(){
             resolve();
           });
-        });
       });
     });
   });
 }
-//API service should have a save itemids, sets and skills
 //getLadderData should call all regions and combine to one JSON with region as a key
-//running this should build all the data needed for a single className
-//heroData should save to a specific className folder
+//Make a separate call to combine every region into one.
 
 module.exports = {
   init: init

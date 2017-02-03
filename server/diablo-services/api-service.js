@@ -7,7 +7,9 @@ var apiTransform = require('./api-transform.js');
 var modelHelper = require('../model-helper.js');
 var apiModelService = require('./api-model-service.js');
 var _ = require('lodash');
-
+var regions = [
+  'us','eu', 'kr'
+];
 var makeEndpointUrl = function makeEndpointUrl(_endpoint, _useApiKey) {
   var endpoint = _endpoint;
   var useApiKey = _useApiKey || false;
@@ -40,35 +42,53 @@ var setAccessToken = function setAccessToken(token) {
 };
 
 
-var loadLadderDataFromJson = function loadLadderDataFromJson(_className) {
-  return crudService._load('js/player-data/'+_className+'/ladder.json');
-};
-
-var loadLadderDataFromEndpoint = function loadLadderDataFromEndpoint(_className) {
-  var endpoint =  makeEndpointUrl(
-    'https://us.api.battle.net/data/d3/season/9/leaderboard/'+_className+'?namespace=2-1-US');
-    return crudService._get(endpoint)
-    .then(function(data){
-      var flatData = apiModelService.parseLadderData(data);
-      var formatter = modelHelper.getFormatter(apiTransform.getLadder);
-      var formatted = formatter(flatData);
-      return crudService._save('js/player-data/'+_className+'ladder.json', formatted);
+var loadLadderDataFromEndpoints = function loadLadderDataFromEndpoints(_className) {
+    return new Promise(function (resolve, reject) {
+      var endpoints = [];
+      for(var i in regions) {
+        var region = regions[i];
+        var endpointString = 'https://' + region + 
+        '.api.battle.net/data/d3/season/9/leaderboard/' + _className;
+        var endpointUrl = makeEndpointUrl(endpointString);
+        endpoints.push(crudService._delayGet(endpointUrl)
+        .then(function(data){
+          var flatData = apiModelService.parseLadderData(data);
+          var formatter = modelHelper.getFormatter(apiTransform.getLadder);
+          var formatted = formatter(flatData);
+          return crudService._save('js/player-data/' + _className + '/' + data.region + '/ladder.json', formatted);
+        }));
+      }
+      return Promise.all(endpoints)
+      .then(function(data){
+        resolve(data[0]);
+      });
     });
+};
+var loadLadderDataFromJson = function loadLadderDataFromJson(_className) {
+  return crudService._load('js/player-data/'+_className+'/us/ladder.json');
 };
 
 var getLadderData = function getLadderData(_className, _refresh) {
   var refresh = _refresh || false;
+  var dir = 'js/player-data/'+_className;
+  if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+    for(var i in regions) {
+      var region = regions[i];
+      fs.mkdirSync(dir + '/' + region)
+    }
+  }
   if(refresh) {
-    return loadLadderDataFromEndpoint(_className);
+    return loadLadderDataFromEndpoints(_className);
   } else { 
     return loadLadderDataFromJson(_className);
   }
 };
 
-var loadHeroDataFromEndpoint = function loadHeroDataFromEndpoint(heroData) {
+var loadHeroDataFromEndpoint = function loadHeroDataFromEndpoint(heroData, className) {
     var heroEndpoint = 
       makeEndpointUrl(heroDataService.getEndpoint(heroData), true);
-    var heroJsonPath = heroDataService.getJsonPath(heroData);
+    var heroJsonPath = heroDataService.getJsonPath(heroData, className);
     var riftData = heroData.data;
    return crudService._delayGet(heroEndpoint)
     .then(function(data) {
@@ -84,25 +104,29 @@ var loadHeroDataFromEndpoint = function loadHeroDataFromEndpoint(heroData) {
       }
       return  crudService._save(heroJsonPath, remodeledData);
     });
-}
-
-var loadHeroDataFromJson = function loadHeroDataFromJson(heroData) {
-  var heroJsonPath = heroDataService.getJsonPath(heroData);
-  return crudService._load(heroJsonPath);
 };
 
-var getHeroData = function getHeroData(heroData, _refresh) {
+var loadHeroDataFromJson = function loadHeroDataFromJson(heroData, className) {
+  var heroJsonPath = heroDataService.getJsonPath(heroData, className);
+  if(fs.existsSync(heroJsonPath)){
+    return crudService._load(heroJsonPath);
+  } else {
+    return loadHeroDataFromEndpoint(heroData, className);
+  }
+};
+
+var getHeroData = function getHeroData(heroData, className, _refresh) {
   var refresh = _refresh || false;
   if(refresh) {
-    return loadHeroDataFromEndpoint(heroData);
+    return loadHeroDataFromEndpoint(heroData, className);
   } else { 
-    return loadHeroDataFromJson(heroData);
+    return loadHeroDataFromJson(heroData, className);
   }
 };
 
 var loadItemDataFromJson = function loadItemDataFromJson(itemString) {
   return crudService._load(itemString);
-}
+};
 
 var loadItemDataFromEndpoint = function loadItemDataFromEndpoint(itemId) {
   var endpoint = "https://us.api.battle.net/d3/data/item/" + itemId;
@@ -115,7 +139,7 @@ var loadItemDataFromEndpoint = function loadItemDataFromEndpoint(itemId) {
       var remodeledData = apiModelService.parseItemData(formatted);
       return crudService._save(itemString, remodeledData);
   });
-}
+};
 
 var getItemData = function getItemData(itemId) {
   var itemString = 'js/item-data/items/' + itemId + '.json';
@@ -125,7 +149,11 @@ var getItemData = function getItemData(itemId) {
     return loadItemDataFromEndpoint(itemId);
   }
 };
+
 var omitInvalidHeroes = function omitInvalidHeroes(className, invalidHeroes) {
+  if(invalidHeroes.length === 0) {
+    return;
+  }
   var heroIds = _.map(invalidHeroes, 'id');
   return loadLadderDataFromJson(className)
   .then(function(data) {
@@ -137,6 +165,83 @@ var omitInvalidHeroes = function omitInvalidHeroes(className, invalidHeroes) {
     }
     return crudService._save('js/player-data/' + className +'/ladder.json', data);
   })
+};
+
+var updateAllItemIds = function updateAllItemIds(itemIds) {
+  return new Promise(function (resolve, reject) {
+    var itemIdsString = 'js/item-data/itemids.json';
+    if(fs.existsSync(itemIdsString)){
+      return loadItemDataFromJson(itemIdsString)
+      .then(function(allItemIds){
+        var differentIds = _.difference(itemIds, allItemIds);
+        if(differentIds.length === 0) {
+          resolve();
+          return;
+        }else {
+          var combinedArrays = _.union(differentIds, allItemIds);
+          return crudService._save(itemIdsString, combinedArrays)
+          .then(function(){
+            resolve();
+          })
+        }
+      });
+    } else {
+        return crudService._save(itemIdsString, itemIds)
+        .then(function(){
+          resolve();
+        })
+    }
+  });
+};
+
+var updateItemSetTypes = function updateItemSetTypes(itemSets) {
+  return new Promise(function (resolve, reject) {
+    var itemSetsString = 'js/item-data/sets.json';
+    if(fs.existsSync(itemSetsString)){
+      return loadItemDataFromJson(itemSetsString)
+      .then(function(allSets){
+        if(_.isEqual(itemSets, allSets)){
+          resolve();
+          return;
+        }
+        var combinedArrays = _.union(itemSets, allSets);
+        var uniqueSetTypes = _.uniqWith(combinedArrays, _.isEqual)
+        return crudService._save(itemSetsString, uniqueSetTypes)
+        .then(function(){
+          resolve();
+        })
+      });
+    } else {
+        return crudService._save(itemSetsString, allSets)
+        .then(function(){
+          resolve();
+        })
+    }
+  });
+};
+var updateHeroSkills = function updateHeroSkills(className, heroSkills) {
+  return new Promise(function (resolve, reject) {
+    var heroSkillsString = 'js/player-data/' + className + '/skills.json';
+    if(fs.existsSync(heroSkillsString)){
+      return loadItemDataFromJson(heroSkillsString)
+      .then(function(allSkills){
+        if(_.isEqual(heroSkills, allSkills)){
+          resolve();
+          return;
+        }
+        var combinedSkills = _.merge(heroSkills, allSkills);
+        return crudService._save(heroSkillsString, combinedSkills)
+        .then(function(){
+          resolve();
+        })
+      });
+    } else {
+        return crudService._save(heroSkillsString, heroSkills)
+        .then(function(){
+          resolve();
+        })
+    }
+  });
 }
 module.exports = {
   makeEndpointUrl: makeEndpointUrl,
@@ -144,5 +249,8 @@ module.exports = {
   getLadderData: getLadderData,
   getHeroData: getHeroData,
   getItemData: getItemData,
-  omitInvalidHeroes: omitInvalidHeroes
+  omitInvalidHeroes: omitInvalidHeroes,
+  updateAllItemIds: updateAllItemIds,
+  updateItemSetTypes: updateItemSetTypes,
+  updateHeroSkills: updateHeroSkills,
 };

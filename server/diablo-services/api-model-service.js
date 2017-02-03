@@ -2,6 +2,8 @@ var _ = require('lodash');
 
 var parseLadderData = function parseLadderData(data) {
     var newObj = {};
+    var region = data._links.self.href.substr(8,2);
+    data.region = region;
     for(var i in data.row) {
       var heroData = data.row[i];
       var dataObj = {};
@@ -18,6 +20,7 @@ var parseLadderData = function parseLadderData(data) {
       }
       heroData.data = dataObj;
       heroData.player = playerObj;
+      heroData.player.region = region;
     }
     return data;
 };

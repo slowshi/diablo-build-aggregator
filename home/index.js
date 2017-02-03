@@ -3,6 +3,8 @@ define([
   'text!item-data/sets.json',
   'lodash',
   'd3tooltips',
+  './js/player-set/index.js',
+  'socket-service',
 ],
 function(app, sets, _, test) {
   app.registerController('HomeController', ['$scope', 'cssInjector', 'socketService',

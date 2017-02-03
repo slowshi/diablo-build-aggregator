@@ -16,18 +16,19 @@ var apiTransformationObject = {
         '*': {
           player: {
             heroBattleTag: true,
-            heroId: true
+            heroId: true,
+            region: true
           },
           data: {
             riftLevel: true,
             riftTime: true,
-          },
-          order: true
+          }
         }
       },
       greaterRift: true,
       greaterRiftSoloClass: true,
-      season: true
+      season: true,
+      region: true
     },
     modelMapping: []
   },
@@ -59,7 +60,6 @@ var apiTransformationObject = {
         '*' : {
           id: true,
           tooltipParams:true,
-          setItemsEquipped: true,
         }
       },
       followers: {

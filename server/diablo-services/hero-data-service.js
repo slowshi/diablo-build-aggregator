@@ -8,23 +8,18 @@ var popularItems = [];
 var allSkills = {};
 var getEndpoint = function getEndpoint(ladderData) {
   var player = ladderData.player;
-  var endpoint = 'https://us.api.battle.net/d3/profile/'+  
-        encodeURIComponent(player.heroBattleTag) + '/hero/' +
-          player.heroId + '?locale=en_US';
+  var region = player.region;
+  var endpoint = 'https://' + region + '.api.battle.net/d3/profile/'+  
+        encodeURIComponent(player.heroBattleTag) + '/hero/' + player.heroId;
   return endpoint;
 }
-var getJsonPath = function getJsonPath(ladderData) { 
-  var jsonPath = 'js/player-data/ladder/';
+var getJsonPath = function getJsonPath(ladderData, className) { 
+  var jsonPath = 'js/player-data/';
   var player = ladderData.player;
-
+  jsonPath += className + '/';
+  jsonPath += player.region + '/';
   jsonPath += player.heroId + '.json';
 
-  return jsonPath;
-};
-
-var getJsonPathFromId = function getJsonPathFromId(id) {
-  var jsonPath = 'js/player-data/ladder/' + id + '.json';
-  
   return jsonPath;
 };
 
