@@ -164,7 +164,7 @@ var omitInvalidHeroes = function omitInvalidHeroes(className, region, invalidHer
         data.row.splice(i,1)
       }
     }
-    return crudService._save('js/player-data/' + className +'/ladder.json', data);
+    return crudService._save('js/player-data/' + className + '/' + region + '/ladder.json', data);
   })
 };
 
