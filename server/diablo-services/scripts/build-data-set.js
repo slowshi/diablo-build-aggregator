@@ -7,11 +7,12 @@ var itemDataService = require('../item-data-service.js');
 var setsDataService = require('../sets-data-service.js');
 var _ = require('lodash');
 
-var init = function init(_className, _refresh) {
+var init = function init(_className, _region, _refresh) {
   var refresh = _refresh || false;
+  var region = _region || 'eu';
   var className = _className || 'rift-monk';
   return new Promise(function (resolve, reject) {
-    apiService.getLadderData(className, refresh).
+    apiService.getLadderData(className, region, refresh).
     then(function(data){
       var heroArray = [];
       for(var i =0; i < data.row.length; i++) {
@@ -43,7 +44,7 @@ var init = function init(_className, _refresh) {
           return apiService.updateHeroSkills(className, allSkills);
         }
         var omitInvalidHeroes = function omitInvalidHeroes() {
-          return apiService.omitInvalidHeroes(className, invalidHeroes)
+          return apiService.omitInvalidHeroes(className, region, invalidHeroes)
         }
         return Promise.all(heroItems)
           .then(saveSets)

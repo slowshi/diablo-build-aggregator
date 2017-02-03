@@ -42,33 +42,37 @@ var setAccessToken = function setAccessToken(token) {
 };
 
 
-var loadLadderDataFromEndpoints = function loadLadderDataFromEndpoints(_className) {
-    return new Promise(function (resolve, reject) {
-      var endpoints = [];
-      for(var i in regions) {
-        var region = regions[i];
+var loadLadderDataFromEndpoint = function loadLadderDataFromEndpoint(_className, region) {
+    //return new Promise(function (resolve, reject) {
+      // var endpoints = [];
+      // for(var i in regions) {
+      //   var region = regions[i];
         var endpointString = 'https://' + region + 
         '.api.battle.net/data/d3/season/9/leaderboard/' + _className;
         var endpointUrl = makeEndpointUrl(endpointString);
-        endpoints.push(crudService._delayGet(endpointUrl)
+        // endpoints.push(
+          console.log(endpointUrl);
+        return crudService._delayGet(endpointUrl)
         .then(function(data){
           var flatData = apiModelService.parseLadderData(data);
           var formatter = modelHelper.getFormatter(apiTransform.getLadder);
           var formatted = formatter(flatData);
           return crudService._save('js/player-data/' + _className + '/' + data.region + '/ladder.json', formatted);
-        }));
-      }
-      return Promise.all(endpoints)
-      .then(function(data){
-        resolve(data[0]);
-      });
-    });
+        })
+    //     );
+    //   }
+    //   return Promise.all(endpoints)
+    //   .then(function(data){
+    //     resolve(data[0]);
+    //   });
+    // });
 };
-var loadLadderDataFromJson = function loadLadderDataFromJson(_className) {
-  return crudService._load('js/player-data/'+_className+'/us/ladder.json');
+var loadLadderDataFromJson = function loadLadderDataFromJson(_className, region) {
+  return crudService._load('js/player-data/'+_className+'/' + region + '/ladder.json');
 };
 
-var getLadderData = function getLadderData(_className, _refresh) {
+var getLadderData = function getLadderData(_className, _region, _refresh) {
+  var region = _region || 'us';
   var refresh = _refresh || false;
   var dir = 'js/player-data/'+_className;
   if (!fs.existsSync(dir)){
@@ -79,9 +83,9 @@ var getLadderData = function getLadderData(_className, _refresh) {
     }
   }
   if(refresh) {
-    return loadLadderDataFromEndpoints(_className);
+    return loadLadderDataFromEndpoint(_className, region);
   } else { 
-    return loadLadderDataFromJson(_className);
+    return loadLadderDataFromJson(_className, region);
   }
 };
 
@@ -150,12 +154,12 @@ var getItemData = function getItemData(itemId) {
   }
 };
 
-var omitInvalidHeroes = function omitInvalidHeroes(className, invalidHeroes) {
+var omitInvalidHeroes = function omitInvalidHeroes(className, region, invalidHeroes) {
   if(invalidHeroes.length === 0) {
     return;
   }
   var heroIds = _.map(invalidHeroes, 'id');
-  return loadLadderDataFromJson(className)
+  return getLadderData(className, region)
   .then(function(data) {
     var i = data.row.length;
     while(i--) {

@@ -11,9 +11,6 @@ var buildDataSet = require('./server/diablo-services/scripts/build-data-set.js')
 
 apiService.setAccessToken(accessToken)
 .then(function(){
-  // parseHeroData.init()
-  // .then(parseItemData.init)
-  // .then(parseHeroSetData.init)
   buildDataSet.init()
   .then(function(){
     startup.initialize(serverUrl)
