@@ -41,29 +41,16 @@ var setAccessToken = function setAccessToken(token) {
 
 
 var loadLadderDataFromEndpoint = function loadLadderDataFromEndpoint(_className, region) {
-    //return new Promise(function (resolve, reject) {
-      // var endpoints = [];
-      // for(var i in regions) {
-      //   var region = regions[i];
-        var endpointString = 'https://' + region + 
-        '.api.battle.net/data/d3/season/9/leaderboard/' + _className;
-        var endpointUrl = makeEndpointUrl(endpointString);
-        // endpoints.push(
-          console.log(endpointUrl);
-        return crudService._delayGet(endpointUrl)
-        .then(function(data){
-          var flatData = apiModelService.parseLadderData(data);
-          var formatter = modelHelper.getFormatter(apiTransform.getLadder);
-          var formatted = formatter(flatData);
-          return crudService._save('js/player-data/' + _className + '/' + data.region + '/ladder.json', formatted);
-        })
-    //     );
-    //   }
-    //   return Promise.all(endpoints)
-    //   .then(function(data){
-    //     resolve(data[0]);
-    //   });
-    // });
+    var endpointString = 'https://' + region + 
+    '.api.battle.net/data/d3/season/9/leaderboard/' + _className;
+    var endpointUrl = makeEndpointUrl(endpointString);
+    return crudService._delayGet(endpointUrl)
+    .then(function(data){
+      var flatData = apiModelService.parseLadderData(data);
+      var formatter = modelHelper.getFormatter(apiTransform.getLadder);
+      var formatted = formatter(flatData);
+      return crudService._save('js/player-data/' + _className + '/' + data.region + '/ladder.json', formatted);
+    });
 };
 var loadLadderDataFromJson = function loadLadderDataFromJson(_className, region) {
   return crudService._load('js/player-data/'+_className+'/' + region + '/ladder.json');

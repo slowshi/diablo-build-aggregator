@@ -124,7 +124,7 @@ var parsePopularGearSets = function parsePopularGearSet() {
       setId++;
       item.skills = _.sortBy(item.skills,['heroes.length']).reverse();
     }
-    allHeroSets = _.sortBy(allHeroSets,['riftLevel.max', 'heroes.length']).reverse();
+    allHeroSets = _.sortBy(allHeroSets,['heroes.length','riftLevel.max']).reverse();
     var variantDiff = 1;
     var variantCheckSets = _.cloneDeep(allHeroSets);
     var variantsList = {};

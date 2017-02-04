@@ -7,7 +7,7 @@ var itemDataService = require('../item-data-service.js');
 var setsDataService = require('../sets-data-service.js');
 var _ = require('lodash');
 
-var init = function init(_className, _region, _refresh) {
+var getOneSet = function getOneSet(_className, _region, _refresh) {
   var refresh = _refresh || false;
   var region = _region || 'us';
   var className = _className || 'rift-monk';
@@ -21,7 +21,6 @@ var init = function init(_className, _region, _refresh) {
           apiService.getHeroData(hero, className, refresh)
           .then(heroDataService.parseHero));
       }
-      console.log("FINiSHED?");
       return Promise.all(heroArray).then(function(res){
         console.log("Done getting users!")
         var invalidHeroes = _.without(res, 0);
@@ -59,10 +58,48 @@ var init = function init(_className, _region, _refresh) {
       });
     });
   });
-}
-//getLadderData should call all regions and combine to one JSON with region as a key
-//Make a separate call to combine every region into one.
+};
 
+var getAllSets = function(_refresh) {
+  var refresh = _refresh || false;
+  return new Promise(function (resolve, reject) {
+    //wd kr crash
+    //wizard kr crash
+    //instead of checking object equal, you have to check if object is contained
+    //safely chain everything
+    //put data into dataStore and pass it with sockets
+    //combine regions
+    //checking full set needs to be more clear
+    //need smarter popular set. check variants with highest used set.
+    var regions = [
+      'us',
+      // 'eu',
+      // 'kr'
+      ];
+    var classes = [
+      'rift-barbarian',
+      // 'rift-crusader',
+      // 'rift-dh',
+      // 'rift-monk',
+      // 'rift-wd',
+      // 'rift-wizard'
+    ];
+    var allSets = [];
+    for(var i in classes) {
+      var className = classes[i];
+      for(var j in regions){
+        var region = regions[j];
+        var classSet = getOneSet(className, region, refresh);
+        allSets.push(classSet);
+      }
+    }
+    return Promise.all(allSets)
+    .then(function(){
+      resolve();
+    });
+  });
+}
 module.exports = {
-  init: init
+  getOneSet: getOneSet,
+  getAllSets: getAllSets
 };
