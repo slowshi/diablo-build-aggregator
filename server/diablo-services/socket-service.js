@@ -15,12 +15,15 @@ var setSocket = function setSocket(connectedIo) {
       socket.on('getPopularGearSets',getPopularGearSets);
       socket.on('getItems', getItems);
     });
-    var getInitialData = function getInitialData() {
+    var getInitialData = function getInitialData(className) {
       io.sockets.emit('getInitialData',{
-        popularGearSets: setsDataService.getPopularGearSets(),
+        // popularGearSets: setsDataService.getPopularGearSets(),
         allSkills: heroDataService.getAllSkills(),
         allItems: itemDataService.getAllItems(),
       })
+    };
+    var getClassData = function getClassData(className){
+      console.log(className)
     }
     var getHeroData = function getHeroData(heroId) {
       io.sockets.emit('getHeroData',heroDataService.getHeroData(heroId));

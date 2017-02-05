@@ -139,6 +139,7 @@ var getItemData = function getItemData(itemId) {
 };
 
 var omitInvalidHeroes = function omitInvalidHeroes(className, region, invalidHeroes) {
+  console.log('a',className, region, invalidHeroes);
   if(invalidHeroes.length === 0) {
     return;
   }

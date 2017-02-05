@@ -4,7 +4,6 @@ var dataStore = require('./data-store.js');
 var allHeroes = {};
 var allItemIds = [];
 var allItems = [];
-var popularItems = [];
 var allSkills = {};
 var getEndpoint = function getEndpoint(ladderData) {
   var player = ladderData.player;
@@ -53,6 +52,7 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
       passives:[]
     }
   };
+  var dataSkills = dataStore.getDataStore('allSkills');
   if(typeof actives !== 'undefined') {
     for(var i in actives) {
       var active = actives[i];
@@ -61,20 +61,22 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
         rune:''
       };
       skillObj.skills.push(active.skill.slug);
-      if(typeof allSkills[active.skill.slug] === 'undefined'){
+      if(typeof dataSkills[active.skill.slug] === 'undefined'){
         active.skill.type = 'active'
-        allSkills[active.skill.slug] = active.skill;
-        allSkills[active.skill.slug].quickTip = 
+        active.skill.quickTip = 
           'class/'+ data.class +'/active/' + active.skill.slug;
+        allSkills[active.skill.slug] = active.skill;
+        dataStore.updateSkillList(active.skill);
       }
       if(typeof active.rune !== 'undefined'){
         skillObj.skills.push(active.rune.slug);
         var splitSlug = active.rune.slug.split('-');
         var runeName = splitSlug[splitSlug.length-1];
         playerSkill.rune = runeName;
-        if(typeof allSkills[active.rune.slug] === 'undefined'){
+        if(typeof dataSkills[active.rune.slug] === 'undefined'){
           active.rune.type = 'rune'
           allSkills[active.rune.slug] = active.rune;
+          dataStore.updateSkillList(active.rune);
         }
       }
       playerSkill.skill = active.skill.slug;
@@ -87,11 +89,12 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
       if(typeof passive.skill !== 'undefined'){
         skillObj.skills.push(passive.skill.slug);
         skillObj.playerSkills.passives.push(passive.skill.slug);
-        if(typeof allSkills[passive.skill.slug] == 'undefined'){
-          passive.skill.type = 'passive';   
+        if(typeof dataSkills[passive.skill.slug] == 'undefined'){
+          passive.skill.type = 'passive';
+          passive.skill.quickTip = 
+            'class/'+ data.class +'/passive/' + passive.skill.slug;   
           allSkills[passive.skill.slug] = passive.skill;
-          allSkills[passive.skill.slug].quickTip = 
-            'class/'+ data.class +'/passive/' + passive.skill.slug;
+          dataStore.updateSkillList(passive.skill);
         }
       }
     }
@@ -133,6 +136,7 @@ var parseHero = function parseHero(data) {
       if(!validateFullSet(data)){
         resolve(data);      
       }else{
+        dataStore.updateHeroList(data);
         allHeroes[data.id] = data;
         resolve(0);
       }
@@ -144,26 +148,23 @@ var parseHero = function parseHero(data) {
 
 
 var getHeroData = function getHeroData(heroId) {
-  return allHeroes[heroId];
+  var heroList = dataStore.getDataStore('allHeroes');
+  return heroList[heroId];
 }
 var getAllHeroes = function getAllHeroes() {
-  return _.cloneDeep(allHeroes);
+  return dataStore.getDataStore('allHeroes')
 }
 
 var getAllItemIds = function getAllItemIds() {
-  return _.cloneDeep(dataStore.getDataStore('allItemIds'));
-}
-var getPopularItems = function getPopularItems() {
-  return _.cloneDeep(popularItems);
+  return dataStore.getDataStore('allItemIds');
 }
 var getAllSkills = function getAllSkills() {
-  return _.cloneDeep(allSkills);
+  return dataStore.getDataStore('allSkills');
 }
 module.exports = {
   getAllHeroes: getAllHeroes,
   getAllItemIds: getAllItemIds,
   getAllSkills: getAllSkills,
-  getPopularItems: getPopularItems,
   parseHero: parseHero,
   getEndpoint: getEndpoint,
   getJsonPath: getJsonPath,
