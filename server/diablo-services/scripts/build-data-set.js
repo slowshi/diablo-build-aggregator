@@ -63,24 +63,22 @@ var getOneSet = function getOneSet(_className, _region, _refresh) {
 var getAllSets = function(_refresh) {
   var refresh = _refresh || false;
   return new Promise(function (resolve, reject) {
-    //instead of checking object equal, you have to check if object is contained
-    //safely chain everything
-    //put data into dataStore and pass it with sockets
-    //combine regions
-    //checking full set needs to be more clear
+    //put itemdata into dataStore and pass it with sockets
+    //Fix saving sests and skills. check contains not equal
+    //combine regions when you get popular data
     //need smarter popular set. check variants with highest used set.
     var regions = [
       'us',
-      // 'eu',
-      // 'kr'
+      'eu',
+      'kr'
       ];
     var classes = [
-      // 'rift-barbarian',
-      // 'rift-crusader',
-      // 'rift-dh',
+      'rift-barbarian',
+      'rift-crusader',
+      'rift-dh',
       'rift-monk',
-      // 'rift-wd',
-      // 'rift-wizard'
+      'rift-wd',
+      'rift-wizard'
     ];
 
     var allSets = [];
