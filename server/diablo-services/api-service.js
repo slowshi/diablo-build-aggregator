@@ -139,21 +139,37 @@ var getItemData = function getItemData(itemId) {
 };
 
 var omitInvalidHeroes = function omitInvalidHeroes(className, region, invalidHeroes) {
-  console.log('a',className, region, invalidHeroes);
   if(invalidHeroes.length === 0) {
     return;
   }
-  var heroIds = _.map(invalidHeroes, 'id');
-  return getLadderData(className, region)
-  .then(function(data) {
-    var i = data.row.length;
-    while(i--) {
-      if(heroIds.indexOf(data.row[i].player.heroId) > -1){
-        data.row.splice(i,1)
+  return new Promise(function (resolve, reject) {
+    var heroIds = _.map(invalidHeroes, 'id');
+    var ladderData = {};
+    console.log("Removing invalid heroes:",heroIds);
+      var updateLadderJson = function () {
+        return crudService._save('js/player-data/' + className + '/' + region + '/ladder.json', ladderData);
+      };
+    getLadderData(className, region)
+    .then(function(data) {
+      ladderData = data;
+      var i = ladderData.row.length;
+      while(i--) {
+        if(heroIds.indexOf(ladderData.row[i].player.heroId) > -1){
+          ladderData.row.splice(i,1)
+        }
       }
-    }
-    return crudService._save('js/player-data/' + className + '/' + region + '/ladder.json', data);
-  })
+      _.reduce(heroIds,function(curr, next){
+        return curr.then(function(){
+          var path = 'js/player-data/' + className + '/' + region + '/' + next + '.json';
+          return crudService._deleteFile(path);
+        })
+      }, Promise.resolve())
+      .then(updateLadderJson)
+      .then(function() {
+          resolve();
+      });
+    })
+  });
 };
 
 var updateAllItemIds = function updateAllItemIds(itemIds) {

@@ -56,31 +56,33 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
   if(typeof actives !== 'undefined') {
     for(var i in actives) {
       var active = actives[i];
-      var playerSkill = {
-        skill:'',
-        rune:''
-      };
-      skillObj.skills.push(active.skill.slug);
-      if(typeof dataSkills[active.skill.slug] === 'undefined'){
-        active.skill.type = 'active'
-        active.skill.quickTip = 
-          'class/'+ data.class +'/active/' + active.skill.slug;
-        allSkills[active.skill.slug] = active.skill;
-        dataStore.updateSkillList(active.skill);
-      }
-      if(typeof active.rune !== 'undefined'){
-        skillObj.skills.push(active.rune.slug);
-        var splitSlug = active.rune.slug.split('-');
-        var runeName = splitSlug[splitSlug.length-1];
-        playerSkill.rune = runeName;
-        if(typeof dataSkills[active.rune.slug] === 'undefined'){
-          active.rune.type = 'rune'
-          allSkills[active.rune.slug] = active.rune;
-          dataStore.updateSkillList(active.rune);
+      if(typeof active.skill !== 'undefined') {
+        var playerSkill = {
+          skill:'',
+          rune:''
+        };
+        skillObj.skills.push(active.skill.slug);
+        if(typeof dataSkills[active.skill.slug] === 'undefined'){
+          active.skill.type = 'active'
+          active.skill.quickTip = 
+            'class/'+ data.class +'/active/' + active.skill.slug;
+          allSkills[active.skill.slug] = active.skill;
+          dataStore.updateSkillList(active.skill);
         }
+        if(typeof active.rune !== 'undefined'){
+          skillObj.skills.push(active.rune.slug);
+          var splitSlug = active.rune.slug.split('-');
+          var runeName = splitSlug[splitSlug.length-1];
+          playerSkill.rune = runeName;
+          if(typeof dataSkills[active.rune.slug] === 'undefined'){
+            active.rune.type = 'rune'
+            allSkills[active.rune.slug] = active.rune;
+            dataStore.updateSkillList(active.rune);
+          }
+        }
+        playerSkill.skill = active.skill.slug;
+        skillObj.playerSkills.actives.push(playerSkill);
       }
-      playerSkill.skill = active.skill.slug;
-      skillObj.playerSkills.actives.push(playerSkill);
     }
   }
   if(typeof passives !== 'undefined') {
@@ -118,7 +120,17 @@ var validateFullSet = function validateFullSet(heroData) {
   var fullSet = true;
   var gearListCount = _.values(heroData.gearList).length;
   var skillListCount = heroData.skillList.length;
-  if (gearListCount < 15 || skillListCount < 16) {
+  var itemSlots = ['head', 'torso', 'feet', 'hands', 'shoulders', 
+  'legs', 'bracers', 'mainHand', 'waist', 'rightFinger', 'leftFinger', 
+  'neck', 'legendary0', 'legendary1', 'legendary2'];
+  var allSlotsFilled = true;
+  for(var i in itemSlots) {
+    var slot = itemSlots[i];
+    if(heroData.gearList[slot] === void 0) {
+      allSlotsFilled = false;
+    }
+  }
+  if (!allSlotsFilled || skillListCount < 16) {
     fullSet = false;
   }
 

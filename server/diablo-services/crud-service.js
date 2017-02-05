@@ -56,10 +56,19 @@ var _delayGet = function _delayGet(_endpoint) {
     });
   });
 };
-
+var _deleteFile = function _deleteFile(_path) {
+  console.log("_deleteFile: ", _path);
+  return new Promise(function (resolve, reject) {
+    var path = _path;
+    fs.unlink(path, function(){
+      resolve()
+    })
+  });
+};
 module.exports = {
   _get: _get,
   _load: _load,
   _save: _save,
-  _delayGet: _delayGet
+  _delayGet: _delayGet,
+  _deleteFile: _deleteFile,
 };
