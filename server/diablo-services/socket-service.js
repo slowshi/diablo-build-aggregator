@@ -18,9 +18,9 @@ var setSocket = function setSocket(connectedIo) {
     });
     var getInitialData = function getInitialData(className) {
       io.sockets.emit('getInitialData',{
-        // popularGearSets: setsDataService.getPopularGearSets(),
-        // allSkills: heroDataService.getAllSkills(),
-        // allItems: itemDataService.getAllItems(),
+        allSkills: dataStore.getDataStore('allSkills'),
+        allSets: dataStore.getDataStore('allSets'),
+        allItems: dataStore.getDataStore('allItems'),
         popularGearSets: dataStore.getDataStore('popularGearList')['rift-monk']['all']
       })
     };

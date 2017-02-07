@@ -94,7 +94,7 @@ define(['app', 'states'], function(app, states) {
             controller: state.controller,
           });
         }
-        console.log($state.current)
+        // console.log($state.current)
       }]);
     var bootstrapApplication = (function() {
       angular.element(document)

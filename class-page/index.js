@@ -14,11 +14,10 @@ function(app, sets, _, test) {
       cssInjector.add('js/vendors/bootstrap/4.0.0/css/bootstrap.min.css');
       cssInjector.add('class-page/index.css');
       var _this = this;
-      var popularGearSets;
-      var allItems;
-      var allSkills;
       _this.allSets = [];
       _this.popularItems = [];
+      var allItems;
+      var allSkills;
       _this.currentSet = $stateParams.setId || 'raiment-of-a-thousand-storms';      
       _this.currentClass = $stateParams.className || 'monk';
       var randomGender = Math.random() > .5 ? '_male' : '_female'
@@ -26,11 +25,9 @@ function(app, sets, _, test) {
       _this.selectSet = function(selectedSet) {
         $state.go('.', {setId: selectedSet});
       }
-      _this.updateGearSets = function updateGearSets() {
-        if(_.isEmpty(popularGearSets)) return;
-        var setByName = popularGearSets[_this.currentSet];
-        _this.popularItems = [];
 
+      _this.updateGearSets = function updateGearSets(setByName) {
+        var parsedItems = [];
         for(var i in setByName) {
           var popularSet = setByName[i];
           var setDetails = [];
@@ -49,42 +46,27 @@ function(app, sets, _, test) {
           for(var o in popularSet.popularSkills.passives) {
             popularSet.popularSkills.passives[o] = allSkills[popularSet.popularSkills.passives[o]];
           }
-          // for(var m in popularSet.skills) {
-          //   var skillObj = popularSet.skills[m].skillList;
-          //   for(var p in skillObj.actives) {
-          //     skillObj.actives[p].skill = allSkills[skillObj.actives[p].skill];
-          //   }
-          //   for(var o in skillObj.passives) {
-          //     skillObj.passives[o] = allSkills[skillObj.passives[o]];
-          //   }
-          // }
-          _this.popularItems.push(popularSet);
+          parsedItems.push(popularSet);
         }
+        return parsedItems;
       }
+
       socketService.emit('getInitialData');
       socketService.on('getInitialData',function(data){
-        (data);
         for(var i in data){
           storeService.updateStoreData(i,data[i]);
         }
-        popularGearSets = storeService.getStoreData('popularGearSets');
-       // console.log('POPULAR', popularGearSets);
-//_this.allSets = _.keys(popularGearSets);
+        var popularGearSets = storeService.getStoreData('popularGearSets');
+        var allSets = storeService.getStoreData('allSets');
         allItems = storeService.getStoreData('allItems');
         allSkills = storeService.getStoreData('allSkills');
-        var parsedSets = JSON.parse(sets);
-        for(var i in parsedSets) {
-          var set = parsedSets[i];
-          console.log('wht', set,popularGearSets[set.slug])
-          if(popularGearSets[set.slug] !== void 0) {
-            _this.allSets.push(set);
-          }
-        }
-        _this.updateGearSets();
-      })
 
-      _this.updateGearSets();
-      console.log('allSets',_this.allSets);
+        var setSlugs = _.keys(popularGearSets);
+        _this.allSets = _.map(setSlugs,function(slug) {
+          return allSets[slug];
+        })
+        _this.popularItems = _this.updateGearSets(popularGearSets[_this.currentSet]);
+      })
       socketService.on('connect', function(){
       });
       socketService.on('disconnect', function(){
