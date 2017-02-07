@@ -1,17 +1,15 @@
 var _ = require('lodash');
 var Promise = require('promise');
 var dataStore = require('./data-store.js');
-var allHeroes = {};
-var allItemIds = [];
-var allItems = [];
-var allSkills = {};
+
 var getEndpoint = function getEndpoint(ladderData) {
   var player = ladderData.player;
   var region = player.region;
   var endpoint = 'https://' + region + '.api.battle.net/d3/profile/'+  
         encodeURIComponent(player.heroBattleTag) + '/hero/' + player.heroId;
   return endpoint;
-}
+};
+
 var getJsonPath = function getJsonPath(ladderData, className) { 
   var jsonPath = 'js/player-data/';
   var player = ladderData.player;
@@ -26,22 +24,17 @@ var parseAllItemIds = function parseAllItemIds(heroData) {
   for (var i in heroData.items) {
     var item = heroData.items[i];
     if(item.id == null) continue;
-    dataStore.updateItemData(item.id);
-    if(allItemIds.indexOf(item.id) == -1) {
-      allItemIds.push(item.id);
-    }
+    dataStore.updateItemList(item.id);
   }
   if(heroData.legendaryPowers !== void 0) {
     for (var j in heroData.legendaryPowers) {
       var legendaryItem = heroData.legendaryPowers[j];
       if(legendaryItem == null) continue;
-      dataStore.updateItemData(legendaryItem);
-      if(allItemIds.indexOf(legendaryItem) == -1) {
-        allItemIds.push(legendaryItem);
-      }
+      dataStore.updateItemList(legendaryItem);
     }
   }
 };
+
 var parseAllSkillIds = function parseAllSkillIds(data) {
   var actives = data.skills.active;
   var passives = data.skills.passive;
@@ -66,7 +59,6 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
           active.skill.type = 'active'
           active.skill.quickTip = 
             'class/'+ data.class +'/active/' + active.skill.slug;
-          allSkills[active.skill.slug] = active.skill;
           dataStore.updateSkillList(active.skill);
         }
         if(typeof active.rune !== 'undefined'){
@@ -76,7 +68,6 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
           playerSkill.rune = runeName;
           if(typeof dataSkills[active.rune.slug] === 'undefined'){
             active.rune.type = 'rune'
-            allSkills[active.rune.slug] = active.rune;
             dataStore.updateSkillList(active.rune);
           }
         }
@@ -95,7 +86,6 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
           passive.skill.type = 'passive';
           passive.skill.quickTip = 
             'class/'+ data.class +'/passive/' + passive.skill.slug;   
-          allSkills[passive.skill.slug] = passive.skill;
           dataStore.updateSkillList(passive.skill);
         }
       }
@@ -103,6 +93,7 @@ var parseAllSkillIds = function parseAllSkillIds(data) {
   }
   return skillObj;
 }
+
 var parseGearIds = function parseGearIds(heroData) {
   var gearSet = {};
   for(var itemKey in heroData.items) {
@@ -116,6 +107,7 @@ var parseGearIds = function parseGearIds(heroData) {
   }
   return gearSet;
 }
+
 var validateFullSet = function validateFullSet(heroData) {
   var fullSet = true;
   var gearListCount = _.values(heroData.gearList).length;
@@ -136,6 +128,7 @@ var validateFullSet = function validateFullSet(heroData) {
 
   return fullSet;
 }
+
 var parseHero = function parseHero(data) {
   return new Promise(function (resolve, reject) {
     if (data.class !== void 0) {
@@ -149,7 +142,6 @@ var parseHero = function parseHero(data) {
         resolve(data);      
       }else{
         dataStore.updateHeroList(data);
-        allHeroes[data.id] = data;
         resolve(0);
       }
     } else {
@@ -158,27 +150,8 @@ var parseHero = function parseHero(data) {
   });
 }
 
-
-var getHeroData = function getHeroData(heroId) {
-  var heroList = dataStore.getDataStore('allHeroes');
-  return heroList[heroId];
-}
-var getAllHeroes = function getAllHeroes() {
-  return dataStore.getDataStore('allHeroes')
-}
-
-var getAllItemIds = function getAllItemIds() {
-  return dataStore.getDataStore('allItemIds');
-}
-var getAllSkills = function getAllSkills() {
-  return dataStore.getDataStore('allSkills');
-}
 module.exports = {
-  getAllHeroes: getAllHeroes,
-  getAllItemIds: getAllItemIds,
-  getAllSkills: getAllSkills,
   parseHero: parseHero,
   getEndpoint: getEndpoint,
   getJsonPath: getJsonPath,
-  getHeroData: getHeroData
 };

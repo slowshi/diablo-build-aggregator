@@ -1,15 +1,7 @@
 var _ = require('lodash');
 var Promise = require('promise');
-var itemDataService = require('./item-data-service.js');
-var heroDataService = require('./hero-data-service.js');
-var allHeroes = {};
+var dataStore = require('./data-store.js');
 var allSets = [];
-var allItems = {};
-var heroSets = {};
-var allHeroSets = [];
-var popularGearSets = [];
-var popularSkillSets = [];
-var brokenData = 0;
 
 var checkGearValid = function checkGearValid(gearSet) {
   var hasSet = '';
@@ -32,58 +24,63 @@ var checkGearValid = function checkGearValid(gearSet) {
   return hasSet;
 }
 
-var getHeroGear = function getHeroGear(heroData) {
-  var gearSet = [];
-  for(var i in heroData.items) {
-    var item = heroData.items[i];
-    gearSet.push(item.id)
-  }
-  if(heroData.legendaryPowers !== void 0) {
-    gearSet = gearSet.concat(heroData.legendaryPowers)
-  }
-  var hasSetSlug = checkGearValid(gearSet);
-  var hasSet = false;
-  var skillList = [];
-  for(var j in allHeroSets) {
-    var setCheck = allHeroSets[j];
-    if(getSetDifference(setCheck.set, gearSet).length == 0){
-      hasSet = true;
-      setCheck.heroes.push(heroData.id);
-      setCheck.riftLevel.push(heroData.riftLevel);
-      setCheck.riftTime.push(heroData.riftTime);
-      var hasSkillset = false;
-      for(var m in setCheck.skills) {
-        var popularSkills = setCheck.skills[m];
-        if(getSetDifference(popularSkills.list, heroData.skillList).length == 0){
-          popularSkills.heroes.push(heroData.id);
-          hasSkillset = true;
+var getHeroGear = function getHeroGear(heroesArray) {
+  var allHeroSets = [];
+  for(var heroIndex in heroesArray) { 
+    var heroData = heroesArray[heroIndex]; 
+    var gearSet = [];
+    for(var i in heroData.items) {
+      var item = heroData.items[i];
+      gearSet.push(item.id)
+    }
+    if(heroData.legendaryPowers !== void 0) {
+      gearSet = gearSet.concat(heroData.legendaryPowers)
+    }
+    var hasSetSlug = checkGearValid(gearSet);
+    var hasSet = false;
+    var skillList = [];
+    for(var j in allHeroSets) {
+      var setCheck = allHeroSets[j];
+      if(getSetDifference(setCheck.set, gearSet).length == 0){
+        hasSet = true;
+        setCheck.heroes.push(heroData.id);
+        setCheck.riftLevel.push(heroData.riftLevel);
+        setCheck.riftTime.push(heroData.riftTime);
+        var hasSkillset = false;
+        for(var m in setCheck.skills) {
+          var popularSkills = setCheck.skills[m];
+          if(getSetDifference(popularSkills.list, heroData.skillList).length == 0){
+            popularSkills.heroes.push(heroData.id);
+            hasSkillset = true;
+          }
+        }
+        if(!hasSkillset) {
+            setCheck.skills.push({
+            list: heroData.skillList,
+            skillList: heroData.playerSkills,
+            heroes: [heroData.id]
+          });
         }
       }
-      if(!hasSkillset) {
-          setCheck.skills.push({
+    }
+    if(!hasSet && hasSetSlug) {
+      var newGearSet = {
+        slug: hasSetSlug,
+        set: gearSet,
+        gearList: heroData.gearList,
+        skills:[{
           list: heroData.skillList,
           skillList: heroData.playerSkills,
           heroes: [heroData.id]
-        });
-      }
+        }],
+        heroes: [heroData.id],
+        riftLevel:[heroData.riftLevel],
+        riftTime:[heroData.riftTime]
+      };
+      allHeroSets.push(newGearSet);
     }
   }
-  if(!hasSet && hasSetSlug) {
-    var newGearSet = {
-      slug: hasSetSlug,
-      set: gearSet,
-      gearList: heroData.gearList,
-      skills:[{
-        list: heroData.skillList,
-        skillList: heroData.playerSkills,
-        heroes: [heroData.id]
-      }],
-      heroes: [heroData.id],
-      riftLevel:[heroData.riftLevel],
-      riftTime:[heroData.riftTime]
-    };
-    allHeroSets.push(newGearSet);
-  }
+  return allHeroSets;
 };
 
 function findAverages(data) {
@@ -111,7 +108,9 @@ function millisToMinutesAndSeconds(millis) {
   return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 }
 
-var parsePopularGearSets = function parsePopularGearSet() {
+var parsePopularGearSets = function parsePopularGearSet(_allHeroSets) {
+    var allHeroSets = _allHeroSets;
+    var popularGearSets = [];
     var setId = 0;
     for(var j = 0; j < allHeroSets.length; j++) {
       var item = allHeroSets[j];
@@ -153,6 +152,7 @@ var parsePopularGearSets = function parsePopularGearSet() {
         popularGearSets.push(allHeroSets[i]);
       }
     }
+    return popularGearSets;
 }
 var countSkillRunes = function countSkillRunes() {
 
@@ -251,7 +251,7 @@ var countSkillActives = function countSkillActives(popularSetSkills){
 
   return popularSpells;
 }
-var getSkillSets = function getSkillSets() {
+var getSkillSets = function getSkillSets(popularGearSets) {
   var popularSkills = {};
   for(var i in popularGearSets) {
     var popularSet = popularGearSets[i];
@@ -275,7 +275,7 @@ var parseHeroSets = function parseHeroSets() {
 
   for(var i in heroesArray) {
     var heroData = heroesArray[i];
-    getHeroGear(heroData);
+    getHeroGear(heroesArray);
   }
 }
 var bestSets = {};
@@ -288,7 +288,7 @@ var getSetDifference = function getSetDifference(set, compare) {
   }
   return setCount;
 }
-var groupSets = function groupSets() {
+var groupSets = function groupSets(popularGearSets) {
   var groupedPopularSets = {};
   for(var i in popularGearSets){
     var gearSet = popularGearSets[i];
@@ -297,18 +297,18 @@ var groupSets = function groupSets() {
     }
     groupedPopularSets[gearSet.slug].push(gearSet);
   }
- 
-  popularGearSets = groupedPopularSets;
+  return groupedPopularSets;
 };
-var init = function init(){
+var init = function init(className, region){
   return new Promise(function (resolve, reject) {
-    allItems = itemDataService.getAllItems();
-    allSets = itemDataService.getAllSets();
-    allHeroes = heroDataService.getAllHeroes();
-    parseHeroSets();
-    parsePopularGearSets();
-    getSkillSets();
-    groupSets();
+    // allItems = itemDataService.getAllItems();
+    // allSets = itemDataService.getAllSets();
+    // allHeroes = heroDataService.getAllHeroes();
+    var heroData;
+    var allHeroSets = parseHeroSets();
+    // var popularGearSets = parsePopularGearSets(allHeroSets);
+    // getSkillSets(popularGearSets);
+    // var groupedPopularSets = groupSets(popularGearSets);
     resolve();
   });
 };
@@ -318,8 +318,18 @@ var getHeroSets = function getHeroSets(slug) {
   }
   return _.cloneDeep(heroSets[slug]);
 }
-var getPopularGearSets = function getPopularGearSets() {
-  return _.cloneDeep(popularGearSets);
+var getPopularGearSets = function getPopularGearSets(heroIds) {
+  var allHeroes = dataStore.getDataStore('allHeroes');
+  allSets = dataStore.getDataStore('allSets');
+  var heroesArray = _.map(heroIds,function(heroId){
+    return allHeroes[heroId];
+  })
+  heroesArray = _.sortBy(heroesArray,['riftLevel']).reverse();
+  var allHeroSets = getHeroGear(heroesArray);
+  var popularGearSets = parsePopularGearSets(allHeroSets);
+  getSkillSets(popularGearSets);
+  var groupedPopularSets = groupSets(popularGearSets);
+  return groupedPopularSets;
 }
 module.exports = {
   init: init,

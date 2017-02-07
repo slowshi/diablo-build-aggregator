@@ -3,6 +3,7 @@ var apiService = require('./api-service.js');
 var heroDataService = require('./hero-data-service.js');
 var setsDataService = require('./sets-data-service.js');
 var itemDataService = require('./item-data-service.js');
+var dataStore = require('./data-store.js');
 var io;
 
 var setSocket = function setSocket(connectedIo) {
@@ -18,8 +19,9 @@ var setSocket = function setSocket(connectedIo) {
     var getInitialData = function getInitialData(className) {
       io.sockets.emit('getInitialData',{
         // popularGearSets: setsDataService.getPopularGearSets(),
-        allSkills: heroDataService.getAllSkills(),
-        allItems: itemDataService.getAllItems(),
+        // allSkills: heroDataService.getAllSkills(),
+        // allItems: itemDataService.getAllItems(),
+        popularGearSets: dataStore.getDataStore('popularGearList')['rift-monk']['all']
       })
     };
     var getClassData = function getClassData(className){

@@ -1,10 +1,12 @@
 var _ = require('lodash');
 var Promise = require('promise');
+var dataStore = require('./data-store.js');
 var allSets = [];
 var allItems = {};
 
 var findSets = function getHeroItems(item) {
   if(item.set !== void 0 && (item.set.ranks.indexOf(6) > -1 || item.set.slug === 'legacy-of-nightmares')) {
+    dataStore.updateSetList(item.set);
     var hasSet = false;
     for(var i in allSets) {
       if (allSets[i].slug == item.set.slug) {
@@ -19,6 +21,7 @@ var findSets = function getHeroItems(item) {
 
 var parseItems = function parseItems(item) {
  return new Promise(function (resolve, reject) {
+    dataStore.updateItemData(item);
     allItems[item.id] = item;
     findSets(item);
     resolve();

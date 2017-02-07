@@ -138,66 +138,63 @@ var getItemData = function getItemData(itemId) {
   }
 };
 
-var omitInvalidHeroes = function omitInvalidHeroes(className, region, invalidHeroes) {
-  if(invalidHeroes.length === 0) {
-    return;
-  }
+var omitInvalidHeroes = function omitInvalidHeroes(className, ladderData, invalidHeroes) {
   return new Promise(function (resolve, reject) {
+    if(invalidHeroes.length === 0) {
+      resolve(ladderData);
+      return;
+    }
+    var region = ladderData.region;
     var heroIds = _.map(invalidHeroes, 'id');
-    var ladderData = {};
     console.log("Removing invalid heroes:",heroIds);
-      var updateLadderJson = function () {
-        return crudService._save('js/player-data/' + className + '/' + region + '/ladder.json', ladderData);
-      };
-    getLadderData(className, region)
-    .then(function(data) {
-      ladderData = data;
-      var i = ladderData.row.length;
-      while(i--) {
-        if(heroIds.indexOf(ladderData.row[i].player.heroId) > -1){
-          ladderData.row.splice(i,1)
-        }
+    var updateLadderJson = function () {
+      return crudService._save('js/player-data/' + className + '/' + region + '/ladder.json', ladderData);
+    };
+    var i = ladderData.row.length;
+    while(i--) {
+      if(heroIds.indexOf(ladderData.row[i].player.heroId) > -1){
+        ladderData.row.splice(i,1)
       }
-      _.reduce(heroIds,function(curr, next){
-        return curr.then(function(){
-          var path = 'js/player-data/' + className + '/' + region + '/' + next + '.json';
-          return crudService._deleteFile(path);
-        })
-      }, Promise.resolve())
-      .then(updateLadderJson)
-      .then(function() {
-          resolve();
-      });
-    })
+    }
+    _.reduce(heroIds,function(curr, next){
+      return curr.then(function(){
+        var path = 'js/player-data/' + className + '/' + region + '/' + next + '.json';
+        return crudService._deleteFile(path);
+      })
+    }, Promise.resolve())
+    .then(updateLadderJson)
+    .then(function(updatedLadderData) {
+        resolve(updatedLadderData);
+    });
   });
 };
 
-var updateAllItemIds = function updateAllItemIds(itemIds) {
-  return new Promise(function (resolve, reject) {
-    var itemIdsString = 'js/item-data/itemids.json';
-    if(fs.existsSync(itemIdsString)){
-      return loadItemDataFromJson(itemIdsString)
-      .then(function(allItemIds){
-        var differentIds = _.difference(itemIds, allItemIds);
-        if(differentIds.length === 0) {
-          resolve();
-          return;
-        }else {
-          var combinedArrays = _.union(differentIds, allItemIds);
-          return crudService._save(itemIdsString, combinedArrays)
-          .then(function(){
-            resolve();
-          })
-        }
-      });
-    } else {
-        return crudService._save(itemIdsString, itemIds)
-        .then(function(){
-          resolve();
-        })
-    }
-  });
-};
+// var updateAllItemIds = function updateAllItemIds(itemIds) {
+//   return new Promise(function (resolve, reject) {
+//     var itemIdsString = 'js/item-data/itemids.json';
+//     if(fs.existsSync(itemIdsString)){
+//       return loadItemDataFromJson(itemIdsString)
+//       .then(function(allItemIds){
+//         var differentIds = _.difference(itemIds, allItemIds);
+//         if(differentIds.length === 0) {
+//           resolve();
+//           return;
+//         }else {
+//           var combinedArrays = _.union(differentIds, allItemIds);
+//           return crudService._save(itemIdsString, combinedArrays)
+//           .then(function(){
+//             resolve();
+//           })
+//         }
+//       });
+//     } else {
+//         return crudService._save(itemIdsString, itemIds)
+//         .then(function(){
+//           resolve();
+//         })
+//     }
+//   });
+// };
 
 var updateItemSetTypes = function updateItemSetTypes(itemSets) {
   return new Promise(function (resolve, reject) {
@@ -205,7 +202,10 @@ var updateItemSetTypes = function updateItemSetTypes(itemSets) {
     if(fs.existsSync(itemSetsString)){
       return loadItemDataFromJson(itemSetsString)
       .then(function(allSets){
-        if(_.isEqual(itemSets, allSets)){
+        var mappedItemSets = _.map(itemSets,'slug');
+        var mappedAllSets = _.map(allSets,'slug');
+        var inter = _.intersection(mappedItemSets,mappedAllSets);
+        if(_.isEqual(mappedItemSets, inter)){
           resolve();
           return;
         }
@@ -217,7 +217,7 @@ var updateItemSetTypes = function updateItemSetTypes(itemSets) {
         })
       });
     } else {
-        return crudService._save(itemSetsString, allSets)
+        return crudService._save(itemSetsString, itemSets)
         .then(function(){
           resolve();
         })
@@ -230,7 +230,9 @@ var updateHeroSkills = function updateHeroSkills(className, heroSkills) {
     if(fs.existsSync(heroSkillsString)){
       return loadItemDataFromJson(heroSkillsString)
       .then(function(allSkills){
-        if(_.isEqual(heroSkills, allSkills)){
+        var heroSkillKeys = _.keys(heroSkills);
+        var alreadyHasSkills = _.every(heroSkillKeys, _.partial(_.has, allSkills));
+        if(alreadyHasSkills){
           resolve();
           return;
         }
@@ -255,7 +257,7 @@ module.exports = {
   getHeroData: getHeroData,
   getItemData: getItemData,
   omitInvalidHeroes: omitInvalidHeroes,
-  updateAllItemIds: updateAllItemIds,
+  // updateAllItemIds: updateAllItemIds,
   updateItemSetTypes: updateItemSetTypes,
   updateHeroSkills: updateHeroSkills,
 };
