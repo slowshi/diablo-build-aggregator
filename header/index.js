@@ -23,12 +23,12 @@ function(app, _, html, css) {
   'storeService', '$stateParams', '$state',
     function($scope, cssInjector, socketService, storeService, $stateParams, $state) {
       this.classList = [
-        'monk',
-        'wizard',
-        'demon-hunter',
-        'crusader',
-        'barbarian',
-        'witch-doctor'
+        'rift-monk',
+        'rift-wizard',
+        'rift-dh',
+        'rift-crusader',
+        'rift-barbarian',
+        'rift-wd'
       ];
       this.selectClass = function selectClass(className) {
         $state.transitionTo('class',{className:className,setId:''});

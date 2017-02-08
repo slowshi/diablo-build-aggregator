@@ -21,7 +21,7 @@ var setSocket = function setSocket(connectedIo) {
         allSkills: dataStore.getDataStore('allSkills'),
         allSets: dataStore.getDataStore('allSets'),
         allItems: dataStore.getDataStore('allItems'),
-        popularGearSets: dataStore.getDataStore('popularGearList')['rift-monk']['all']
+        popularGearSets: dataStore.getDataStore('popularGearList')
       })
     };
     var getClassData = function getClassData(className){

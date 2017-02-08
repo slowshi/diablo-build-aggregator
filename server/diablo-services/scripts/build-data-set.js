@@ -64,6 +64,7 @@ var getOneSet = function getOneSet(_className, _region, _refresh) {
 
 var getAllSets = function(_refresh) {
   var refresh = _refresh || false;
+  refresh = true;
   return new Promise(function (resolve, reject) {
     //validate that all the items are sets or uniques too.
     //put itemdata into dataStore and pass it with sockets
@@ -75,12 +76,12 @@ var getAllSets = function(_refresh) {
       'kr'
       ];
     var classes = [
-      // 'rift-barbarian',
-      // 'rift-crusader',
-      // 'rift-dh',
+      'rift-barbarian',
+      'rift-crusader',
+      'rift-dh',
       'rift-monk',
-      // 'rift-wd',
-      // 'rift-wizard'
+      'rift-wd',
+      'rift-wizard'
     ];
 
     var allSets = [];
@@ -99,8 +100,8 @@ var getAllSets = function(_refresh) {
     }, Promise.resolve()).then(function() {
       var ladderList = dataStore.getDataStore('ladderList');
       for(var className in ladderList){
-        var popularGearSet = setsDataService.getPopularGearSets(ladderList[className].all);
-        dataStore.updatePopularGearList(className, 'all', popularGearSet);
+        // var popularGearSet = setsDataService.getPopularGearSets(ladderList[className].all);
+        // dataStore.updatePopularGearList(className, 'us', popularGearSet);
         // for(var region in ladderList[className]) {
         //   var popularGearSet = setsDataService.getPopularGearSets(ladderList[className][region]);
         //   dataStore.updatepopularGearList(className, region, popularGearSet);
