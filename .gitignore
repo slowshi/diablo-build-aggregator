@@ -2,7 +2,8 @@
 logs
 *.log
 npm-debug.log*
-
+js/item-data
+js/player-data
 # Runtime data
 pids
 *.pid
