@@ -17,16 +17,22 @@ var getOneSet = function getOneSet(_className, _region, _refresh) {
     then(function(data){
       var ladderData = data;
       var heroArray = [];
+      var omitInvalidHeroes = function omitInvalidHeroes(res) {
+        var invalidHeroes = _.without(res, 0);
+        return apiService.omitInvalidHeroes(className, ladderData, invalidHeroes)
+      }
       for(var i =0; i < ladderData.row.length; i++) {
         var hero = ladderData.row[i];
         heroArray.push(
           apiService.getHeroData(hero, className, refresh)
           .then(heroDataService.parseHero));
       }
-      var omitInvalidHeroes = function omitInvalidHeroes(res) {
-        var invalidHeroes = _.without(res, 0);
-        return apiService.omitInvalidHeroes(className, ladderData, invalidHeroes)
-      }
+      // _.reduce(ladderData.row,function(curr, next){
+      //   return curr.then(function(){
+      //     return apiService.getHeroData(next, className, refresh)
+      //     .then(heroDataService.parseHero);
+      //   })
+      // }, Promise.resolve())
       return Promise.all(heroArray)
       .then(omitInvalidHeroes)
       .then(function(res){
@@ -64,7 +70,7 @@ var getOneSet = function getOneSet(_className, _region, _refresh) {
 
 var getAllSets = function(_refresh) {
   var refresh = _refresh || false;
-  refresh = true;
+ refresh = true;
   return new Promise(function (resolve, reject) {
     //validate that all the items are sets or uniques too.
     //put itemdata into dataStore and pass it with sockets
@@ -95,13 +101,13 @@ var getAllSets = function(_refresh) {
     }
     _.reduce(allSets,function(curr, next){
       return curr.then(function(){
-        return getOneSet(next[0],next[1]);
+        return getOneSet(next[0], next[1], refresh);
       })
     }, Promise.resolve()).then(function() {
       var ladderList = dataStore.getDataStore('ladderList');
       for(var className in ladderList){
-        // var popularGearSet = setsDataService.getPopularGearSets(ladderList[className].all);
-        // dataStore.updatePopularGearList(className, 'us', popularGearSet);
+        var popularGearSet = setsDataService.getPopularGearSets(ladderList[className].all);
+        dataStore.updatePopularGearList(className, 'all', popularGearSet);
         // for(var region in ladderList[className]) {
         //   var popularGearSet = setsDataService.getPopularGearSets(ladderList[className][region]);
         //   dataStore.updatepopularGearList(className, region, popularGearSet);
