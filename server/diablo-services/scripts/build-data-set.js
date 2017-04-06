@@ -70,7 +70,7 @@ var getOneSet = function getOneSet(_className, _region, _refresh) {
 
 var getAllSets = function(_refresh) {
   var refresh = _refresh || false;
- refresh = true;
+//  refresh = true;
   return new Promise(function (resolve, reject) {
     //validate that all the items are sets or uniques too.
     //put itemdata into dataStore and pass it with sockets

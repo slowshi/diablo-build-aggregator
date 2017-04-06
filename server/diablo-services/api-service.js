@@ -42,7 +42,7 @@ var setAccessToken = function setAccessToken(token) {
 
 var loadLadderDataFromEndpoint = function loadLadderDataFromEndpoint(_className, region) {
     var endpointString = 'https://' + region + 
-    '.api.battle.net/data/d3/season/9/leaderboard/' + _className;
+    '.api.battle.net/data/d3/season/10/leaderboard/' + _className;
     var endpointUrl = makeEndpointUrl(endpointString);
     return crudService._delayGet(endpointUrl)
     .then(function(data){
